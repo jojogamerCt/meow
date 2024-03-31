@@ -28,10 +28,8 @@ import configparser
 load_dotenv()
 config = configparser.ConfigParser()
 config.read('config.ini')
-# Get the JSON string from the .ini file
-pokeball_for_pokemon_string = config.get('settings', 'pokemon_pokeball_mapping')
-# Parse the JSON string as a dictionary
-pokeball_for_pokemon = json.loads(pokeball_for_pokemon_string)
+
+
 
 
 POKEMON_DICTIONARY = json.loads(os.getenv('POKEMON_DICTIONARY'))
@@ -39,10 +37,17 @@ RARITY_EMOJI = json.loads(os.getenv('RARITY_EMOJI'))
 logger = Logger.getInstance().get_logger()
 captcha_service = CaptchaService()
 
-ENABLE_AUTO_BUY_BALLS=os.getenv('ENABLE_AUTO_BUY_BALLS')
-ENABLE_AUTO_RELEASE_DUPLICATES=os.getenv('ENABLE_AUTO_RELEASE_DUPLICATES')
-ENABLE_AUTO_EGG_HATCH=os.getenv('ENABLE_AUTO_EGG_HATCH')
-ENABLE_AUTO_LOOTBOX=os.getenv('ENABLE_AUTO_LOOTBOX_OPEN')
+# Get the JSON string from the .ini file
+pokeball_for_pokemon_string = config.get('settings', 'pokemon_pokeball_mapping')
+# Parse the JSON string as a dictionary
+pokeball_for_pokemon = json.loads(pokeball_for_pokemon_string)
+# Get the boolean settings
+ENABLE_AUTO_BUY_BALLS = config.getboolean('settings', 'ENABLE_AUTO_BUY_BALLS')
+ENABLE_AUTO_RELEASE_DUPLICATES = config.getboolean('settings', 'ENABLE_AUTO_RELEASE_DUPLICATES')
+ENABLE_AUTO_EGG_HATCH = config.getboolean('settings', 'ENABLE_AUTO_EGG_HATCH')
+ENABLE_AUTO_LOOTBOX = config.getboolean('settings', 'ENABLE_AUTO_LOOTBOX_OPEN')
+ENABLE_FISHING = config.getboolean('settings', 'ENABLE_FISHING')
+
 
 class Driver:
     def __init__(self, driver_path):
@@ -179,7 +184,7 @@ class Driver:
 
         return False
     
-    def wait_for_element_text_to_change(self, element, timeout=15) -> WebElement:
+    def wait_for_element_text_to_change(self, element, timeout=15, check_every=1) -> WebElement:
         try:
             # Store the initial text of the element
             initial_text = element.text
@@ -197,7 +202,7 @@ class Driver:
                     return None
 
                 # Wait before checking the text of the element again
-                time.sleep(1)
+                time.sleep(check_every)
 
             # If the timeout is reached without the text of the element changing, return None
             logger.warning("Timeout reached without text change")
@@ -420,16 +425,43 @@ class Driver:
                     time.sleep(3)
                     self.write(";lb all")
                 break      
+            
+    def fish(self):
+        self.write(";f")
+        pokemeow_element_response = self.get_last_element_by_user("PokéMeow", timeout=30)
+        
+        if pokemeow_element_response is None:
+            logger.error('No response from PokéMeow...')
+            return
+            
+        if "A wild Captcha appeared!" in pokemeow_element_response.text:
+            logger.warning('Captcha detected')
+            self.solve_captcha(pokemeow_element_response)
+            return
+                
+        if "Please wait" in pokemeow_element_response.text:
+            logger.info('Please wait...')
+            time.sleep(1.5)
+            return
+        
+        self.wait_for_element_text_to_change(pokemeow_element_response, check_every=0.2)
+        # button = self.driver.find_element(By.CLASS_NAME, 'button_class')
+        # if button:
+        #     button.click()
+        #     logger.info('')
+        
     
     def print_initial_message(self):
         logger.warning("[Autplay settings] AutoBuy enabled: " + str(ENABLE_AUTO_BUY_BALLS))
         logger.warning("[Autplay settings] AutoLootbox enabled: " + str(ENABLE_AUTO_LOOTBOX))
         logger.warning("[Autplay settings] AutoRelease enabled: " + str(ENABLE_AUTO_RELEASE_DUPLICATES))
         logger.warning("[Autplay settings] AutoEgg enabled: " + str(ENABLE_AUTO_EGG_HATCH))
+        logger.warning("[Autplay settings] AutoFishing enabled: " + str(ENABLE_FISHING))
         logger.warning("[Autplay Advice] you can pause the bot by pressing 'p' in the console")
         logger.warning("[Autplay Advice] you can resume the bot by pressing 'enter' in the console")
         logger.warning("[Autplay Advice] you can stop the bot by pressing 'ctrl + c' in the console")
         logger.warning("="*60 + "\n")      
+    
 
     def play(self):
         
@@ -498,6 +530,11 @@ class Driver:
                     inventory = self.get_inventory()
                     self.buy_balls(inventory)
             
+            if ENABLE_FISHING:
+                if catch_counter % 3 == 0:
+                    time.sleep(2)
+                    self.fish()
+                    sleep_time = 2
             
             
             if catch_counter % 50 == 0:
