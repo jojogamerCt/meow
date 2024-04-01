@@ -527,9 +527,14 @@ class Driver:
             # Try to find the button inside the <li> element
             # You may need to adjust the selector based on the specific button you are looking for
             button = li_element.find_element(By.TAG_NAME, "button")
+            time.sleep(0.5)
             button.click()
             
             encounter_element = self.wait_for_element_text_to_change(li_element, check_every=1)
+            
+            if "The Pokemon got away" in encounter_element.text:
+                logger.info(f'🎣 [ESCAPED!] The Pokemon got away.')
+                return
             
             spawn_info = self.get_fish_spawn_info(encounter_element.get_attribute('outerHTML'))
             #IF shiny or golden fish, catch it
