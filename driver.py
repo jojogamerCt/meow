@@ -9,7 +9,7 @@ from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.common.action_chains import ActionChains
 from selenium.webdriver.common.keys import Keys
-from counter import save_catch_counter, load_catch_counter
+from counter import save_counters, load_counters
 import random
 import json
 from selenium.webdriver.remote.webelement import WebElement
@@ -233,6 +233,36 @@ class Driver:
             new_captcha_element = self.get_last_message_from_user("PokéMeow")
             self.solve_captcha(new_captcha_element)
     
+    def get_fish_spawn_info(self, element):
+        # Parse the HTML content
+        pokemon_info = {}
+        soup = BeautifulSoup(element, "html.parser")
+        # print(soup)
+        pokemon_description = soup.select_one("div[class*='embedDescription']")
+
+        pokemon_info["Item"] = data = soup.find('img', {'aria-label': ':held_item:'}) is not None
+
+        if pokemon_description:
+            # Find all strong elements within the description
+            strong_elements = pokemon_description.find_all("strong")
+
+
+            if strong_elements:
+                # Get the last strong element
+                last_strong_element = strong_elements[-1]
+
+                # Extract Pokémon name
+                pokemon_info["Name"] = last_strong_element.get_text(strip=True)
+                pokemon_info["Shiny"] = False
+                pokemon_info["Golden"] = False
+                
+                if "shiny" in pokemon_info["Name"].lower():
+                    pokemon_info["Shiny"] = True
+                    
+                if "golden" in pokemon_info["Name"].lower():
+                    pokemon_info["Golden"] = True
+        # print(pokemon_info)
+        return pokemon_info
     
     def get_spawn_info(self, element):
         
@@ -337,7 +367,6 @@ class Driver:
 
         return inventory
     
-    
     def get_catch_result(self, pokemon_info, count, element):
         if isinstance(pokemon_info, str):
             pokemon_info = json.loads(pokemon_info)
@@ -379,16 +408,58 @@ class Driver:
                     item_received = item_received_span.find_next('strong').text
                 else:
                     item_received = "Unknown Item"
-                logger.info(f'[{count}] [CATCHED!] Rarity: {pokemon_rarity} {emoji} | Pokemon: {pokemon_name} | Earned Coins: {earned_coins} | Item: {item_received}')
+                logger.info(f'🍚 [{count}] [CATCHED!] Rarity: {pokemon_rarity} {emoji} | Pokemon: {pokemon_name} | Earned Coins: {earned_coins} | Item: {item_received}')
                 return
             
             # Print the Pokemon name, rarity, and earned coins in one line
-            logger.info(f'[{count}] [CATCHED!] Rarity: {pokemon_rarity} {emoji} | Pokemon: {pokemon_name} | Earned Coins: {earned_coins}')
+            logger.info(f'🍚 [{count}] [CATCHED!] Rarity: {pokemon_rarity} {emoji} | Pokemon: {pokemon_name} | Earned Coins: {earned_coins}')
             return
         else:
-            logger.info(f'[{count}] [ESCAPED!] Rarity: {pokemon_rarity} {emoji} | Pokemon: {pokemon_name}')
+            logger.info(f'🍚 [{count}] [ESCAPED!] Rarity: {pokemon_rarity} {emoji} | Pokemon: {pokemon_name}')
             return
-       
+    
+    def get_fish_catch_result(self, pokemon_info, count, element):
+        if isinstance(pokemon_info, str):
+            pokemon_info = json.loads(pokemon_info)
+
+        soup = BeautifulSoup(element.get_attribute('outerHTML'), "html.parser")
+        pokemon_was_catched = soup.find_all(string=lambda text: '✅' in text)
+
+        # Get the Pokemon name and rarity from pokemon_info
+        pokemon_name = pokemon_info.get('Name')
+        pokemon_rarity = pokemon_info.get('Rarity')
+        has_item = pokemon_info.get('Item')
+        emoji = RARITY_EMOJI.get(pokemon_rarity, '')
+
+        if pokemon_was_catched:
+            footer_text = soup.find('div', class_='embedFooter_c26cec').get_text(strip=True)
+            fishing_tokens_match = re.search(r'earned (\d+) Fishing Token', footer_text)
+
+            # Initialize fishing_tokens to 0, then update if found in the text
+            fishing_tokens = 0
+            if fishing_tokens_match:
+                fishing_tokens = int(fishing_tokens_match.group(1))
+
+            # Log the catch result with the number of Fishing Tokens earned
+            #Print if shiny or golden fish, if golden print a golden emoji 🟡 if shiny print a shiny emoji
+  
+            if pokemon_info["Shiny"]:
+                logger.info(f'🎣 [CATCHED!] {emoji} {pokemon_name} | Fishing Tokens: {fishing_tokens}'
+                            f' | Shiny: ✨')
+                return {'caught': True, 'fishing_tokens': fishing_tokens}
+            elif pokemon_info["Golden"]:
+                logger.info(f'🎣 [CATCHED!] {emoji} {pokemon_name} | Fishing Tokens: {fishing_tokens}'
+                            f' | Golden: 🟡')
+                return {'caught': True, 'fishing_tokens': fishing_tokens}
+            
+            # If the Pokémon was caught, log and return that information
+            logger.info(f'🎣 [CATCHED!] Pokemon: {pokemon_name} | Fishing Tokens: {fishing_tokens}')
+            return {'caught': True, 'fishing_tokens': fishing_tokens}
+        else:
+            # If the Pokémon was not caught, log and return that information
+            logger.info(f'🎣 [ESCAPED!] Pokemon: {pokemon_name}')
+            return {'caught': False, 'fishing_tokens': 0}
+    
     def buy_balls(self, inventory):
         time.sleep(5)
         # Initialize pokecoin count to 0
@@ -427,6 +498,12 @@ class Driver:
                 break      
             
     def fish(self):
+                # Check if user pressed 'p' to pause the execution
+        if msvcrt.kbhit() and msvcrt.getch().decode('utf-8') == 'p':
+            logger.warning('Execution paused. Press enter to continue...')
+            input("Execution paused. Press enter to continue...")
+
+        counters = load_counters()
         self.write(";f")
         pokemeow_element_response = self.get_last_element_by_user("PokéMeow", timeout=30)
         
@@ -444,11 +521,35 @@ class Driver:
             time.sleep(1.5)
             return
         
-        self.wait_for_element_text_to_change(pokemeow_element_response, check_every=0.2)
-        # button = self.driver.find_element(By.CLASS_NAME, 'button_class')
-        # if button:
-        #     button.click()
-        #     logger.info('')
+        li_element = self.wait_for_element_text_to_change(pokemeow_element_response, check_every=0.2)
+        try:
+
+            # Try to find the button inside the <li> element
+            # You may need to adjust the selector based on the specific button you are looking for
+            button = li_element.find_element(By.TAG_NAME, "button")
+            button.click()
+            
+            encounter_element = self.wait_for_element_text_to_change(li_element, check_every=1)
+            
+            spawn_info = self.get_fish_spawn_info(encounter_element.get_attribute('outerHTML'))
+            #IF shiny or golden fish, catch it
+            if spawn_info["Shiny"] or spawn_info["Golden"]:
+                self.click_on_ball("masterball")
+            else:
+                self.click_on_ball("greatball")
+            
+            catch_status_element = self.wait_for_element_text_to_change(pokemeow_element_response)
+            counters['fish_counter'] += 1
+            save_counters(counters)
+            self.get_fish_catch_result(spawn_info, counters['fish_counter'], catch_status_element)
+            
+        except NoSuchElementException as e:
+            # Add fishing emoji with counter
+            counters['fish_counter'] += 1
+            save_counters(counters)
+            fish_counter = counters['fish_counter']
+            logger.info(f'🎣 [ESCAPED!] No fish found.')
+
         
     
     def print_initial_message(self):
@@ -461,6 +562,15 @@ class Driver:
         logger.warning("[Autplay Advice] you can resume the bot by pressing 'enter' in the console")
         logger.warning("[Autplay Advice] you can stop the bot by pressing 'ctrl + c' in the console")
         logger.warning("="*60 + "\n")      
+        API_KEY = os.getenv('API_KEY')
+        #Check that api key len is up to 20
+        if len(API_KEY) < 20:
+            logger.error("API_KEY not found. Please add your API_KEY in the .env file !")
+            logger.error("API_KEY not found. Please add your API_KEY in the .env file !")
+            logger.error("API_KEY not found. Please add your API_KEY in the .env file !")
+            logger.error("Quitting driver !")
+            self.driver.quit()
+            return
     
 
     def play(self):
@@ -472,7 +582,7 @@ class Driver:
         time.sleep(4)
         self.write(";quest") 
         time.sleep(4)
-        catch_counter = load_catch_counter()
+        counters = load_counters()
         while True:
             
             # Check if user pressed 'p' to pause the execution
@@ -521,9 +631,10 @@ class Driver:
             
             # Wait for the text of the element to change
             catch_status_element = self.wait_for_element_text_to_change(pokemeow_element_response)
-            catch_counter += 1
-            save_catch_counter(catch_counter)
-            self.get_catch_result(info_json, catch_counter, catch_status_element)
+            counters['catch_counter'] += 1
+            save_counters(counters)
+            catch_counter = counters['catch_counter']
+            self.get_catch_result(info_json, counters['catch_counter'], catch_status_element)
             
             if ENABLE_AUTO_BUY_BALLS:
                 if info["Balls"]["Pokeballs"] <= 1 or info["Balls"]["Greatballs"] <= 1:
@@ -531,7 +642,8 @@ class Driver:
                     self.buy_balls(inventory)
             
             if ENABLE_FISHING:
-                if catch_counter % 3 == 0:
+                #Every 2 catches, fish
+                if catch_counter % 2 == 0:
                     time.sleep(2)
                     self.fish()
                     sleep_time = 2
