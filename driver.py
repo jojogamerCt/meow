@@ -247,7 +247,7 @@ class Driver:
                     return None
 
                 # Wait before checking the text of the element again
-                interruptible_sleep(check_every)
+                time.sleep(check_every)
 
             # If the timeout is reached without the text of the element changing, return None
             logger.warning("Timeout reached without text change")
@@ -386,7 +386,7 @@ class Driver:
     def click_on_ball(self, ball):
         # Attempt to find the specific ball first.
         try:
-            interruptible_sleep(1)
+            time.sleep(1)
             last_element_html = self.get_last_element_by_user("PokéMeow")
             balls = last_element_html.find_elements("css selector",f'img[alt="{ball}"]')
             if balls:
@@ -586,7 +586,7 @@ class Driver:
             # Try to find the button inside the <li> element
             # You may need to adjust the selector based on the specific button you are looking for
             button = li_element.find_element(By.TAG_NAME, "button")
-            interruptible_sleep(0.5)
+            time.sleep(0.5)
             button.click()
             
             encounter_element = self.wait_for_element_text_to_change(li_element, check_every=1)
@@ -692,9 +692,7 @@ class Driver:
             has_item = info["Item"]
             #Try to catch the pokemon
             if has_item and rarity not in "Legendary" and rarity not in "Shiny":
-                
-                if not self.click_on_ball(hunt_item_ball):
-                    continue 
+                self.click_on_ball(hunt_item_ball)
             else:
                 if info["Name"] in pokeball_for_pokemon:
                     ball = pokeball_for_pokemon[info["Name"]]

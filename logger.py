@@ -1,7 +1,30 @@
 import logging
 from dotenv import load_dotenv
-import colorlog
 import os
+from colorama import Fore, Style, init
+import logging
+
+# Initialize colorama
+init()
+
+class CustomFormatter(logging.Formatter):
+
+    format = '%(asctime)s - %(levelname)s - %(message)s'
+
+    FORMATS = {
+        logging.DEBUG: Fore.LIGHTBLACK_EX + format + Style.RESET_ALL,
+        logging.INFO: Fore.LIGHTBLACK_EX + format + Style.RESET_ALL,
+        logging.WARNING: Fore.YELLOW + format + Style.RESET_ALL,
+        logging.ERROR: Fore.RED + format + Style.RESET_ALL,
+        logging.CRITICAL: Fore.LIGHTRED_EX + format + Style.RESET_ALL
+    }
+
+    def format(self, record):
+        log_fmt = self.FORMATS.get(record.levelno)
+        formatter = logging.Formatter(log_fmt, datefmt='%m/%d/%Y %I:%M:%S %p')
+        return formatter.format(record)
+
+
 class Logger:
     _instance = None
 
@@ -42,23 +65,10 @@ class Logger:
             f_handler.setLevel(logging.DEBUG)
 
             # Create formatters and add it to handlers
-            c_format = colorlog.ColoredFormatter(
-                "%(log_color)s%(asctime)s - %(levelname)s - %(message)s",
-                datefmt='%m/%d/%Y %I:%M:%S %p',
-                log_colors={
-                    'DEBUG': 'cyan',
-                    'INFO': 'white',
-                    'WARNING': 'yellow',
-                    'ERROR': 'red',
-                    'CRITICAL': 'red,bg_white',
-                }
-            )
-            
-            # Create formatters and add it to handlers
             # c_format = logging.Formatter('%(asctime)s - %(levelname)s - %(message)s', datefmt='%m/%d/%Y %I:%M:%S %p')
-            f_format = logging.Formatter('%(asctime)s - %(levelname)s - %(message)s', datefmt='%m/%d/%Y %I:%M:%S %p')
-            c_handler.setFormatter(c_format)
-            f_handler.setFormatter(f_format)
+            # f_format = logging.Formatter('%(asctime)s - %(levelname)s - %(message)s', datefmt='%m/%d/%Y %I:%M:%S %p')
+            c_handler.setFormatter(CustomFormatter())
+            f_handler.setFormatter(CustomFormatter())
 
             # Add handlers to the logger
             self.logger.addHandler(c_handler)
