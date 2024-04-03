@@ -2,7 +2,13 @@ import os
 import json
 
 # Define the path to the file where you want to store catch_counter
-CATCH_COUNTER_FILE = "catch_counter.json"
+SESSION_NAME = os.getenv('SESSION_NAME')
+
+# Create the json_info folder if it doesn't exist
+os.makedirs('json_info', exist_ok=True)
+
+# Specify the json_info folder in the file path
+CATCH_COUNTER_FILE = f"json_info/catch_{SESSION_NAME}.json"
 
 def save_counters(counters):
     # Save counters to a file
@@ -17,4 +23,3 @@ def load_counters():
             return data
     else:
         return {'catch_counter': 0, 'fish_counter': 0}
-    

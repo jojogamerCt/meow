@@ -4,10 +4,18 @@ from selenium.webdriver.common.by import By
 import requests
 from logger import Logger
 from dotenv import load_dotenv
-
-logger = Logger(__name__).getInstance().get_logger()
+import configparser
+logger = Logger.getInstance().get_logger()
 load_dotenv()
-PREDICT_CAPTCHA_URL = os.getenv('PREDICT_CAPTCHA_URL')
+
+
+config = configparser.ConfigParser()
+
+# Open the file with the 'utf-8' encoding and read it with config.read_file
+with open('config.ini', 'r', encoding='utf-8') as f:
+    config.read_file(f)
+
+predict_captcha_url = config.get('settings', 'predict_captcha_url')
 API_KEY = os.getenv('API_KEY')
 
 class CaptchaService:
@@ -40,7 +48,7 @@ class CaptchaService:
     
     @staticmethod 
     def send_image(image_path):
-        url = PREDICT_CAPTCHA_URL
+        url = predict_captcha_url
         headers = {
             "X-RapidAPI-Key": API_KEY,
             "X-RapidAPI-Host": "pokemeow-captcha-solver.p.rapidapi.com"

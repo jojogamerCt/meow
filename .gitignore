@@ -2,7 +2,12 @@
 webdrivers/
 __pycache__/
 captchas/
-file.log
+*.log
 index.html
 test/
-catch_counter.json
+*.json
+pokemon_counts.json
+*.bat
+!run_account_example.bat
+logs/
+json_info/

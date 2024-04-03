@@ -1,8 +1,10 @@
 pip install -r requirements.txt
-set EMAIL=cursedelboom02@gmail.com
-set PASSWORD=1324rt556
-set CHANNEL=https://discord.com/channels/1220056646437568582/1220056647087427666
-set API_KEY=3fe858485cmsh4b09dad8226ecc6p149f14jsn799ac3bc7fb1
+set SESSION_NAME=account1
+set EMAIL=email1@gmail.com
+set PASSWORD=strongpassword
+set CHANNEL=https://discord.com/channels/id/channel
+set API_KEY=RAPID-API-KEY
+set DISCORD_TOKEN=DISCORD-TOKEN
 set ENABLE_AUTO_BUY_BALLS=True
 set ENABLE_AUTO_RELEASE_DUPLICATES=False
 set ENABLE_AUTO_EGG_HATCH=True

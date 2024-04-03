@@ -24,29 +24,38 @@ from inventory import Inventory
 from buy import Buy
 from selenium.common.exceptions import TimeoutException
 import configparser
-
+from catch_statistics import CatchStatistics
+import chromedriver_autoinstaller
+from helpers.sleep_helper import interruptible_sleep
+from helpers.fish_count import count_fish
 load_dotenv()
 config = configparser.ConfigParser()
-config.read('config.ini')
+
+# Open the file with the 'utf-8' encoding and read it with config.read_file
+with open('config.ini', 'r', encoding='utf-8') as f:
+    config.read_file(f)
+    
+catch_statistics = CatchStatistics()
 
 
+ENABLE_AUTO_BUY_BALLS = os.getenv('ENABLE_AUTO_BUY_BALLS') == 'True'
+ENABLE_AUTO_RELEASE_DUPLICATES = os.getenv('ENABLE_AUTO_RELEASE_DUPLICATES') == 'True'
+ENABLE_AUTO_EGG_HATCH = os.getenv('ENABLE_AUTO_EGG_HATCH') == 'True'
+ENABLE_AUTO_LOOTBOX = os.getenv('ENABLE_AUTO_LOOTBOX_OPEN') == 'True'
+ENABLE_FISHING = os.getenv('ENABLE_FISHING') == 'True'
 
-
-POKEMON_DICTIONARY = json.loads(os.getenv('POKEMON_DICTIONARY'))
-RARITY_EMOJI = json.loads(os.getenv('RARITY_EMOJI'))
 logger = Logger.getInstance().get_logger()
 captcha_service = CaptchaService()
 
-# Get the JSON string from the .ini file
-pokeball_for_pokemon_string = config.get('settings', 'pokemon_pokeball_mapping')
-# Parse the JSON string as a dictionary
-pokeball_for_pokemon = json.loads(pokeball_for_pokemon_string)
-# Get the boolean settings
-ENABLE_AUTO_BUY_BALLS = config.getboolean('settings', 'ENABLE_AUTO_BUY_BALLS')
-ENABLE_AUTO_RELEASE_DUPLICATES = config.getboolean('settings', 'ENABLE_AUTO_RELEASE_DUPLICATES')
-ENABLE_AUTO_EGG_HATCH = config.getboolean('settings', 'ENABLE_AUTO_EGG_HATCH')
-ENABLE_AUTO_LOOTBOX = config.getboolean('settings', 'ENABLE_AUTO_LOOTBOX_OPEN')
-ENABLE_FISHING = config.getboolean('settings', 'ENABLE_FISHING')
+# Get the JSON string from the .ini
+pokeball_for_pokemon = json.loads(config.get('settings', 'pokemon_pokeball_mapping'))
+rarity_pokeball_mapping = json.loads(config.get('settings', 'rarity_pokeball_mapping'))
+rarity_emoji = json.loads(config.get('settings', 'rarity_emoji'))
+
+fishing_pokeball = config.get('settings', 'fishing_ball')
+hunt_item_ball = config.get('settings', 'hunt_item_ball')
+fish_shiny_golden_ball = config.get('settings', 'fishing_shiny_golden_ball')
+
 
 
 class Driver:
@@ -62,7 +71,14 @@ class Driver:
         options.add_argument("--log-level=3")
         #Open the browser 800x700
         options.add_argument("--window-size=800,700")
-        self.driver = webdriver.Chrome(executable_path=self.driver_path, options=options)
+        try:
+            self.driver = webdriver.Chrome(executable_path=self.driver_path, options=options)
+        except:
+            logger.warning(f"Driver not found in path: {self.driver_path}")
+            logger.warning(f"or version incompatible")
+            logger.warning(f"Downloading compatible version...")
+            chromedriver_autoinstaller.install()
+            self.driver = webdriver.Chrome(options=options)
     
     def navigate_to_page(self, url):
         if self.driver is not None:
@@ -76,19 +92,48 @@ class Driver:
         else:
             logger.info("Driver not started. Nothing to quit.")
             
+    def inject_token(self, token):
+        logger.info("Loging with token!")
+        # Open Discord login page
+        self.driver.get("https://discord.com/login")
+
+        # Inject token using JavaScript
+        script = f"""
+            const token = "{token}";
+            setInterval(() => {{
+                document.body.appendChild(document.createElement('iframe')).contentWindow.localStorage.token = `"${{token}}"`;
+            }}, 50);
+            setTimeout(() => {{
+                location.reload();
+            }}, 2500);
+        """
+        self.driver.execute_script(script)
+
+        # Wait for the login process to complete
+        interruptible_sleep(5)
+
+        # Verify if login was successful (you can add your own logic here)
+        if self.driver.current_url == "https://discord.com/channels/@me":
+            logger.info("Login successful!")
+        else:
+            logger.error("Login with token failed.")
+        
     def login(self, email, password):
-        time.sleep(5)
+        
+        
+        interruptible_sleep(5)
         
         self.driver.find_element(By.XPATH, "//input[@name='email']").send_keys(email)
         
         self.driver.find_element(By.XPATH, "//input[@name='password']").send_keys(password)
-        time.sleep(3)
+        interruptible_sleep(3)
         self.driver.find_element(By.XPATH, "//button[@type='submit']").click()
 
-        time.sleep(8)
+        interruptible_sleep(8)
         pass 
 
 
+        
     def write(self, msg):
         # span = self.driver.find_element(By.XPATH, "//span[contains(@class='emptyText'])")
         span = self.driver.find_element(By.XPATH, "//span[contains(@class, 'emptyText')]")
@@ -132,7 +177,7 @@ class Driver:
             return captcha_service.send_image(img_path)
         except StaleElementReferenceException:
             logger.error("StaleElementReferenceException occurred. Retrying...")
-            time.sleep(1)
+            interruptible_sleep(1)
             return self.get_captcha()
     
     
@@ -202,7 +247,7 @@ class Driver:
                     return None
 
                 # Wait before checking the text of the element again
-                time.sleep(check_every)
+                interruptible_sleep(check_every)
 
             # If the timeout is reached without the text of the element changing, return None
             logger.warning("Timeout reached without text change")
@@ -216,6 +261,7 @@ class Driver:
     def solve_captcha(self, element):
         
         #Download the captcha image and send it to the API
+        catch_statistics.add_captcha_encounter()
         number = self.get_captcha()
         
         # Write the captcha number in the chat
@@ -253,6 +299,7 @@ class Driver:
 
                 # Extract Pokémon name
                 pokemon_info["Name"] = last_strong_element.get_text(strip=True)
+                    
                 pokemon_info["Shiny"] = False
                 pokemon_info["Golden"] = False
                 
@@ -262,6 +309,7 @@ class Driver:
                 if "golden" in pokemon_info["Name"].lower():
                     pokemon_info["Golden"] = True
         # print(pokemon_info)
+        
         return pokemon_info
     
     def get_spawn_info(self, element):
@@ -311,6 +359,7 @@ class Driver:
 
         # Convert dictionary to JSON
         pokemon_json = json.dumps(pokemon_info, indent=4)
+        catch_statistics.add_hunt_encounter()
         return pokemon_json
     
     def get_next_ball(self, current_ball):
@@ -337,7 +386,7 @@ class Driver:
     def click_on_ball(self, ball):
         # Attempt to find the specific ball first.
         try:
-            time.sleep(1)
+            interruptible_sleep(1)
             last_element_html = self.get_last_element_by_user("PokéMeow")
             balls = last_element_html.find_elements("css selector",f'img[alt="{ball}"]')
             if balls:
@@ -345,14 +394,17 @@ class Driver:
                 balls[-1].click()
             else:
                 next_ball = self.get_next_ball(ball)
-                logger.info(f"❌ {ball} not found. Trying {next_ball}")
+                logger.warning(f"{ball} not found. Trying {next_ball}")
+                if next_ball is None:
+                    logger.error("No more balls to try.")
+                    return False
                 self.click_on_ball(next_ball)
                 
         except Exception as e:
             logger.log(f"An error occurred: {e}")
     
     def get_inventory(self):
-        time.sleep(1)
+        interruptible_sleep(1)
         self.write(";inv")
         # Wait to load inventory
         last_element_html = self.get_last_element_by_user("PokéMeow")
@@ -378,7 +430,7 @@ class Driver:
         pokemon_name = pokemon_info.get('Name')
         pokemon_rarity = pokemon_info.get('Rarity')
         has_item = pokemon_info.get('Item')
-        emoji = RARITY_EMOJI.get(pokemon_rarity, '')
+        emoji = rarity_emoji.get(pokemon_rarity, '')
         # Check if any element contains the ✅ emoji
         if pokemon_was_catched:
             
@@ -401,7 +453,7 @@ class Driver:
 
             if has_item:
                 # Looking for the span that contains the text indicating the item received
-                item_received_span = soup.find('span', string=lambda text: 'retrieved a' in text if text else False)
+                item_received_span = soup.find('span', string=lambda text: 'retrieved a' in text if text else False)        
 
                 # Extracting the text of the next strong tag which should contain the name of the item received
                 if item_received_span:
@@ -409,10 +461,12 @@ class Driver:
                 else:
                     item_received = "Unknown Item"
                 logger.info(f'🍚 [{count}] [CATCHED!] Rarity: {pokemon_rarity} {emoji} | Pokemon: {pokemon_name} | Earned Coins: {earned_coins} | Item: {item_received}')
+                catch_statistics.add_catch(pokemon_rarity, earned_coins, item_received)
                 return
             
             # Print the Pokemon name, rarity, and earned coins in one line
             logger.info(f'🍚 [{count}] [CATCHED!] Rarity: {pokemon_rarity} {emoji} | Pokemon: {pokemon_name} | Earned Coins: {earned_coins}')
+            catch_statistics.add_catch(pokemon_rarity, earned_coins)
             return
         else:
             logger.info(f'🍚 [{count}] [ESCAPED!] Rarity: {pokemon_rarity} {emoji} | Pokemon: {pokemon_name}')
@@ -429,7 +483,7 @@ class Driver:
         pokemon_name = pokemon_info.get('Name')
         pokemon_rarity = pokemon_info.get('Rarity')
         has_item = pokemon_info.get('Item')
-        emoji = RARITY_EMOJI.get(pokemon_rarity, '')
+        emoji = rarity_emoji.get(pokemon_rarity, '')
 
         if pokemon_was_catched:
             footer_text = soup.find('div', class_='embedFooter_c26cec').get_text(strip=True)
@@ -442,7 +496,7 @@ class Driver:
 
             # Log the catch result with the number of Fishing Tokens earned
             #Print if shiny or golden fish, if golden print a golden emoji 🟡 if shiny print a shiny emoji
-  
+            catch_statistics.add_fish_encounter(fishing_tokens)
             if pokemon_info["Shiny"]:
                 logger.info(f'🎣 [CATCHED!] {emoji} {pokemon_name} | Fishing Tokens: {fishing_tokens}'
                             f' | Shiny: ✨')
@@ -458,10 +512,11 @@ class Driver:
         else:
             # If the Pokémon was not caught, log and return that information
             logger.info(f'🎣 [ESCAPED!] Pokemon: {pokemon_name}')
+            catch_statistics.add_fish_encounter(0)
             return {'caught': False, 'fishing_tokens': 0}
     
     def buy_balls(self, inventory):
-        time.sleep(5)
+        interruptible_sleep(5)
         # Initialize pokecoin count to 0
         budget = 0
 
@@ -484,7 +539,7 @@ class Driver:
             #Wait 3 scs before writing next command
             logger.info(f'💰 {command}')
             self.write(command)
-            time.sleep(5.5)
+            interruptible_sleep(5.5)
     
     def open_lootbox(self, inventory):
         for item in inventory:
@@ -493,16 +548,11 @@ class Driver:
                 # Update pokecoin count
                 lootboxes = item["count"]
                 if lootboxes > 10:
-                    time.sleep(3)
+                    interruptible_sleep(3)
                     self.write(";lb all")
                 break      
             
     def fish(self):
-                # Check if user pressed 'p' to pause the execution
-        if msvcrt.kbhit() and msvcrt.getch().decode('utf-8') == 'p':
-            logger.warning('Execution paused. Press enter to continue...')
-            input("Execution paused. Press enter to continue...")
-
         counters = load_counters()
         self.write(";f")
         pokemeow_element_response = self.get_last_element_by_user("PokéMeow", timeout=30)
@@ -518,16 +568,25 @@ class Driver:
                 
         if "Please wait" in pokemeow_element_response.text:
             logger.info('Please wait...')
-            time.sleep(1.5)
+            interruptible_sleep(2)
+            self.fish()
+            return
+        
+        if "Not even a nibble" in pokemeow_element_response.text:
+            logger.info('🎣 [ESCAPED!] Not even a nibble...')
             return
         
         li_element = self.wait_for_element_text_to_change(pokemeow_element_response, check_every=0.2)
+        
+        if li_element is None:
+            logger.error('No response from PokéMeow while fishing...')
+            return
         try:
 
             # Try to find the button inside the <li> element
             # You may need to adjust the selector based on the specific button you are looking for
             button = li_element.find_element(By.TAG_NAME, "button")
-            time.sleep(0.5)
+            interruptible_sleep(0.5)
             button.click()
             
             encounter_element = self.wait_for_element_text_to_change(li_element, check_every=1)
@@ -537,11 +596,17 @@ class Driver:
                 return
             
             spawn_info = self.get_fish_spawn_info(encounter_element.get_attribute('outerHTML'))
+            count_fish(spawn_info)
             #IF shiny or golden fish, catch it
             if spawn_info["Shiny"] or spawn_info["Golden"]:
-                self.click_on_ball("masterball")
+                self.click_on_ball(fish_shiny_golden_ball)
             else:
-                self.click_on_ball("greatball")
+                if spawn_info["Name"] in pokeball_for_pokemon:
+                    ball = pokeball_for_pokemon[spawn_info["Name"]]
+                    logger.info(f"🔴 Pokemon '{spawn_info['Name']}' found in the dictionary. Using {ball}...")
+                    self.click_on_ball(ball)
+                else:
+                    self.click_on_ball(fishing_pokeball)
             
             catch_status_element = self.wait_for_element_text_to_change(pokemeow_element_response)
             counters['fish_counter'] += 1
@@ -564,8 +629,12 @@ class Driver:
         logger.warning("[Autplay settings] AutoEgg enabled: " + str(ENABLE_AUTO_EGG_HATCH))
         logger.warning("[Autplay settings] AutoFishing enabled: " + str(ENABLE_FISHING))
         logger.warning("[Autplay Advice] you can pause the bot by pressing 'p' in the console")
+        logger.warning("[Autplay Advice] you can see statistics by pressing 's' in the console")
         logger.warning("[Autplay Advice] you can resume the bot by pressing 'enter' in the console")
         logger.warning("[Autplay Advice] you can stop the bot by pressing 'ctrl + c' in the console")
+        logger.warning('[config.ini] Default ball for Fishing: %s', fishing_pokeball)
+        logger.warning('[config.ini] Default ball for Pokemons with Held Items: %s', hunt_item_ball)
+        logger.warning('[config.ini] Default ball for Shinies or Golden while Fishing: %s', fish_shiny_golden_ball)
         logger.warning("="*60 + "\n")      
         API_KEY = os.getenv('API_KEY')
         #Check that api key len is up to 20
@@ -584,19 +653,13 @@ class Driver:
         
         #Initial commands
         self.write(";daily")
-        time.sleep(4)
+        interruptible_sleep(4)
         self.write(";quest") 
-        time.sleep(4)
+        interruptible_sleep(4)
         counters = load_counters()
         while True:
-            
-            # Check if user pressed 'p' to pause the execution
-            if msvcrt.kbhit() and msvcrt.getch().decode('utf-8') == 'p':
-                logger.warning('Execution paused. Press enter to continue...')
-                input("Execution paused. Press enter to continue...")
-                
-            
-            sleep_time = random.randint(7, 10)
+                        
+            sleep_time = random.randint(7,9)
             # sleep_time = 7
             self.write(";p")
             
@@ -613,18 +676,25 @@ class Driver:
                 
             if "Please wait" in pokemeow_element_response.text:
                 logger.info('Please wait...')
-                time.sleep(1.5)
+                interruptible_sleep(1.5)
+                continue
+            
+            if "Please catch the" in pokemeow_element_response.text:
+                logger.error('Please catch the Pokemon you spawned first!')
+                interruptible_sleep(3)
                 continue
             
             info_json = self.get_spawn_info(pokemeow_element_response)
             info = json.loads(info_json)
             
             rarity = info["Rarity"]
-            ball = POKEMON_DICTIONARY.get(rarity)
+            ball = rarity_pokeball_mapping.get(rarity)
             has_item = info["Item"]
             #Try to catch the pokemon
             if has_item and rarity not in "Legendary" and rarity not in "Shiny":
-                self.click_on_ball("ultraball")
+                
+                if not self.click_on_ball(hunt_item_ball):
+                    continue 
             else:
                 if info["Name"] in pokeball_for_pokemon:
                     ball = pokeball_for_pokemon[info["Name"]]
@@ -649,7 +719,7 @@ class Driver:
             if ENABLE_FISHING:
                 #Every 2 catches, fish
                 if catch_counter % 2 == 0:
-                    time.sleep(2)
+                    interruptible_sleep(2)
                     self.fish()
                     sleep_time = 2
             
@@ -661,31 +731,35 @@ class Driver:
                 if ENABLE_AUTO_LOOTBOX:
                     self.open_lootbox(inventory)
                 
+                can_hold_egg = False
                 if ENABLE_AUTO_EGG_HATCH:
                     egg_status = Inventory.get_egg_status(self.get_last_message_from_user("PokéMeow"))
                     if egg_status["can_hatch"]:
-                            time.sleep(3)
+                            interruptible_sleep(3)
                             logger.info("🐣 Hatching egg...")
                             self.write(";egg hatch")
-                            hatch_element = self.get_last_element_by_user("PokéMeow", timeout=30)
-                            # self.get_hatch_result(hatch_element)
+                            can_hold_egg = True
+
                             
                     # Check if can hatch or hold egg
                     poke_egg_count = next((item['count'] for item in inventory if item['name'] == 'poke_egg'), None)
                     if poke_egg_count > 0:
-                        if egg_status["can_hold"]:
-                            time.sleep(3)
+                        if egg_status["can_hold"] or can_hold_egg:
+                            interruptible_sleep(6)
                             logger.info("🥚 Holding egg...")
                             self.write(";egg hold")
+                            
             
             #Writes quest and release duplicates every 100 catches
             if catch_counter % 100 == 0:
-                time.sleep(3)
+                interruptible_sleep(3)
                 self.write(";quest")
                 # if ENABLE_AUTO_RELEASE_DUPLICATES:
-                #     time.sleep(4.5)
+                #     interruptible_sleep(4.5)
                 #     self.write(";r d")
-            time.sleep(sleep_time)
+                
+                
+            interruptible_sleep(sleep_time)
 
     
     
