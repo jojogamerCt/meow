@@ -18,6 +18,7 @@ class CatchStatistics:
         self.total_hunt_encounters = 0
         self.total_fish_encounters = 0
         self.total_fish_tokens = 0
+        self.total_battles_won = 0
         self.total_captchas_encountered = 0
 
     def add_catch(self, rarity, coins, item=None):
@@ -40,6 +41,9 @@ class CatchStatistics:
 
     def add_captcha_encounter(self):
         self.total_captchas_encountered += 1
+    
+    def add_battles_won(self):
+        self.total_battles_won += 1
 
     def get_statistics(self):
         return {
@@ -48,6 +52,7 @@ class CatchStatistics:
             "ItemsReceived": self.items_received,
             "TotalHuntEncounters": self.total_hunt_encounters,
             "TotalFishEncounters": self.total_fish_encounters,
+            "TotalBattlesWon": self.total_battles_won,
             "TotalFishTokens": self.total_fish_tokens,
             "TotalCaptchasEncountered": self.total_captchas_encountered
         }

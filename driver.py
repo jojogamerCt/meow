@@ -43,6 +43,7 @@ ENABLE_AUTO_RELEASE_DUPLICATES = os.getenv('ENABLE_AUTO_RELEASE_DUPLICATES') == 
 ENABLE_AUTO_EGG_HATCH = os.getenv('ENABLE_AUTO_EGG_HATCH') == 'True'
 ENABLE_AUTO_LOOTBOX = os.getenv('ENABLE_AUTO_LOOTBOX_OPEN') == 'True'
 ENABLE_FISHING = os.getenv('ENABLE_FISHING') == 'True'
+ENABLE_BATTLE_NPC = os.getenv('ENABLE_BATTLE_NPC') == 'True'
 
 logger = Logger.getInstance().get_logger()
 captcha_service = CaptchaService()
@@ -179,8 +180,7 @@ class Driver:
             logger.error("StaleElementReferenceException occurred. Retrying...")
             interruptible_sleep(1)
             return self.get_captcha()
-    
-    
+      
     def get_last_element_by_user(self, username, timeout=30) -> WebElement:
         try:
             # Wait for a new message from the user to appear
@@ -620,7 +620,80 @@ class Driver:
             fish_counter = counters['fish_counter']
             logger.info(f'🎣 [ESCAPED!] No fish found.')
 
+    def wait_next_message(self, timeout=10):
+        # Define the XPath
+        xpath = f"//li[contains(@class, 'messageListItem')]"
+
+        # Get the last message that currently matches the XPath
+        old_messages = self.driver.find_elements(By.XPATH, xpath)
+        old_last_message = old_messages[-1] if old_messages else None
+
+        # Wait for a new message to appear
+        try:
+            WebDriverWait(self.driver, timeout).until(
+                lambda driver: self.driver.find_elements(By.XPATH, xpath)[-1] != old_last_message
+            )
+            # Get the last message that matches the XPath after waiting
+            new_messages = self.driver.find_elements(By.XPATH, xpath)
+            # Return the new message
+            return new_messages[-1]
+        except TimeoutException:
+            return None
         
+    def battle(self):
+        self.write(";battle npc 1")
+        pokemeow_element_response = self.get_last_element_by_user("PokéMeow", timeout=30)
+            
+        if pokemeow_element_response is None:
+            logger.error('[Battle] No response from PokéMeow, trying again...')
+            self.battle()
+            return
+        
+        if "A wild Captcha appeared!" in pokemeow_element_response.text:
+            logger.warning('[Battle] Captcha detected')
+            self.solve_captcha(pokemeow_element_response)
+            interruptible_sleep(3)
+            self.battle()
+            return
+            
+        if "Please wait" in pokemeow_element_response.text:
+            logger.info('[Battle] Please wait...')
+            interruptible_sleep(3)
+            self.battle()
+            return
+        
+        if "Please catch the" in pokemeow_element_response.text:
+            logger.error('Please catch the Pokemon you spawned first!')
+            interruptible_sleep(3)
+            return
+        
+        logger.info('[Battle] Battle started!')
+        # While message not into won battle or lost battle
+        while True:
+            last_element_html = self.wait_next_message(timeout=20)
+            if last_element_html is None:
+                logger.error('No response found from PokéMeow while battling...')
+                break
+            time.sleep(1)
+            
+            if "won the battle" in last_element_html.text:
+                logger.info('[Battle] Battle won!')
+                catch_statistics.add_battles_won()
+                break
+            if "lost the battle" in last_element_html.text:
+                logger.warning('[Battle] Battle lost!')
+                break
+            time.sleep(1)
+            first_button = last_element_html.find_element(By.XPATH, ".//button")
+            
+            # Check if the button was found
+            if first_button:
+                # Click the first button
+                logger.info('[Battle] Using the first attack button...')
+                first_button.click()
+            else:
+                logger.info("[Battle] No button found")
+  
     
     def print_initial_message(self):
         logger.warning("[Autplay settings] AutoBuy enabled: " + str(ENABLE_AUTO_BUY_BALLS))
@@ -628,6 +701,7 @@ class Driver:
         logger.warning("[Autplay settings] AutoRelease enabled: " + str(ENABLE_AUTO_RELEASE_DUPLICATES))
         logger.warning("[Autplay settings] AutoEgg enabled: " + str(ENABLE_AUTO_EGG_HATCH))
         logger.warning("[Autplay settings] AutoFishing enabled: " + str(ENABLE_FISHING))
+        logger.warning("[Autplay settings] AutoBattle enabled: " + str(ENABLE_BATTLE_NPC))
         logger.warning("[Autplay Advice] you can pause the bot by pressing 'p' in the console")
         logger.warning("[Autplay Advice] you can see statistics by pressing 's' in the console")
         logger.warning("[Autplay Advice] you can resume the bot by pressing 'enter' in the console")
@@ -645,8 +719,7 @@ class Driver:
             logger.error("Quitting driver !")
             self.driver.quit()
             return
-    
-
+        
     def play(self):
         
         self.print_initial_message()
@@ -720,7 +793,12 @@ class Driver:
                     interruptible_sleep(2)
                     self.fish()
                     sleep_time = 2
-            
+                    
+            if ENABLE_BATTLE_NPC:
+                if catch_counter % 3 == 0:
+                    interruptible_sleep(2)
+                    self.battle()
+                    sleep_time = 2
             
             if catch_counter % 50 == 0:
                 #Check inventory
