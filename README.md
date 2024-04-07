@@ -53,39 +53,45 @@ The captcha solver currently boasts around a 90% accuracy rate 🎯. However, ex
    py main.py
    pause
     ```
-
-Replace the placeholders with your actual data.
-
-7. **Run the Bot:** Execute the bot script with Python to start catching Pokemons automatically. Use the following command to run your bot: 🎮
-
-    ```bash
-    python main.py
+   Setup your settings `config.ini`
+    ```plaintext
+   [settings]
+   rarity_emoji={
+       "Legendary": "🔮", 
+       "Shiny": "✨", 
+       "Super": "★", 
+       "Super Rare": "★ ★", 
+       "Rare": "★", 
+       "Uncommon": "♦",
+       "Common": "●"
+        }
+   
+   rarity_pokeball_mapping={
+       "Legendary": "masterball",
+       "Shiny": "masterball",
+       "Super": "ultraball",
+       "Super Rare": "ultraball", 
+       "Rare": "greatball", 
+       "Uncommon": "pokeball", 
+       "Common": "pokeball"
+       }
+   
+   pokemon_pokeball_mapping = {
+       "Shieldon": "greatball",
+       "Machoke": "greatball",
+       "Magikarp": "greatball"
+       }
+   
+   fishing_ball = greatball
+   
+   hunt_item_ball = ultraball
+   
+   fishing_shiny_golden_ball = masterball
+   
+   driver_path = webdrivers\Chrome\chromedriver.exe
+   
+   predict_captcha_url=https://pokemeow-captcha-solver.p.rapidapi.com/predict
     ```
-
-Ensure you replace placeholder values with your actual data before proceeding. This setup guide is designed to help you get started with the PokeMeow Catcher Bot quickly and efficiently.
-
-
-
-## Example Code for Captcha Solver Api Service🧑‍💻
-Below is an example of how to implement the captcha solver in Python. 
-Note that you need your own 'X-RapidAPI-Key' for authentication.
-
-```python
-import requests
-
-url = "https://pokemeow-captcha-solver.p.rapidapi.com/predict"
-
-# Replace 'captcha-file.png' with the path to your captcha image
-files = { "file": open('captcha-file.png', 'rb') }
-headers = {
-    "X-RapidAPI-Key": "your-api-key-here",
-    "X-RapidAPI-Host": "pokemeow-captcha-solver.p.rapidapi.com"
-}
-
-response = requests.post(url, files=files, headers=headers)
-print(response.json())
-```
-
 
 ## 📬 Contact
 
