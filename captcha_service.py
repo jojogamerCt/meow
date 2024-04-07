@@ -5,6 +5,7 @@ import requests
 from logger import Logger
 from dotenv import load_dotenv
 import configparser
+import time
 logger = Logger.getInstance().get_logger()
 load_dotenv()
 
@@ -54,26 +55,28 @@ class CaptchaService:
             "X-RapidAPI-Host": "pokemeow-captcha-solver.p.rapidapi.com"
         }
 
-        # Open the image file in binary mode
         with open(image_path, "rb") as image_file:
-            # Create a dictionary with the file
             files = {"file": image_file}
-
-            for _ in range(3):  # Retry up to 3 times
-                logger.info("🚀 Sending image to RapidApi...")
-
+            retry_delay = 5  # 5 seconds delay between retries
+            for attempt in range(5):  # Retry up to 3 times
+                logger.info(f"🚀 Sending image to RapidApi, attempt {attempt+1}...")
                 try:
-                    # Make the POST request and get the response
-                    response = requests.post(url, files=files, headers=headers, timeout=35)  # Wait up to 35 seconds
-
-                    # If the request was successful, print the number from the response
+                    response = requests.post(url, files=files, headers=headers, timeout=35)
                     if response.status_code == 200:
                         logger.info("✅ Image sent successfully!")
                         return response.json()["number"]
                     else:
-                        logger.info("❌ Failed to send image")
-                        # logger.info(f"❌ Message: {response.json()['messages']}")
+                        logger.error(f"❌ Failed to send image, status code: {response.status_code}")
+                        logger.error(f"❌ Message: {response.text}")
                 except requests.exceptions.Timeout:
-                    logger.info("⏰ Request timed out, retrying...")
+                    logger.error("⏰ Request timed out, retrying...")
+                except requests.exceptions.ConnectionError:
+                    logger.error("🔌 Connection error, retrying...")
+                except requests.exceptions.RequestException as e:
+                    logger.error(f"🚫 Request error: {e}, retrying...")
+                
+                if attempt < 2:  # Avoid sleep after the last attempt
+                    time.sleep(retry_delay)
 
         logger.info("❌ Failed to send image after 3 attempts")
+        return None

@@ -609,6 +609,11 @@ class Driver:
                     self.click_on_ball(fishing_pokeball)
             
             catch_status_element = self.wait_for_element_text_to_change(pokemeow_element_response)
+            
+            if catch_status_element is None:
+                logger.error('No response from PokéMeow while fishing...')
+                return
+            
             counters['fish_counter'] += 1
             save_counters(counters)
             self.get_fish_catch_result(spawn_info, counters['fish_counter'], catch_status_element)
