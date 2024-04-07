@@ -23,9 +23,9 @@ The captcha solver currently boasts around a 90% accuracy rate 🎯. However, ex
  Get your the API-KEY 🔑: [PokeMeow Captcha Solver](https://rapidapi.com/qqqwda/api/pokemeow-captcha-solver)
 
 
-    Edit the `run_account_example.bat` (You can use Email and Password or Discord token):
+   Edit the `run_account_example.bat` (You can use Email and Password or Discord token):
 
-    ```plaintext
+   ```plaintext
     pip install -r requirements.txt
    set SESSION_NAME=account1
    set EMAIL=email1@gmail.com
@@ -41,9 +41,9 @@ The captcha solver currently boasts around a 90% accuracy rate 🎯. However, ex
    set ENABLE_BATTLE_NPC=False
    py main.py
    pause
-    ```
+   ```
    Setup your settings `config.ini`
-    ```plaintext
+   ```plaintext
    [settings]
    rarity_emoji={
        "Legendary": "🔮", 
@@ -80,7 +80,7 @@ The captcha solver currently boasts around a 90% accuracy rate 🎯. However, ex
    driver_path = webdrivers\Chrome\chromedriver.exe
    
    predict_captcha_url=https://pokemeow-captcha-solver.p.rapidapi.com/predict
-    ```
+   ```
 
 ## 📬 Contact
 
