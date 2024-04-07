@@ -81,7 +81,7 @@ The captcha solver currently boasts around a 90% accuracy rate 🎯. However, ex
    
    predict_captcha_url=https://pokemeow-captcha-solver.p.rapidapi.com/predict
    ```
-To run just double click on run_account_example.bat file
+To run just double click on `run_account_example.bat`  file
 
 ## 📬 Contact
 
