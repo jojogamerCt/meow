@@ -20,18 +20,7 @@ The captcha solver currently boasts around a 90% accuracy rate 🎯. However, ex
 
 ## 🚀 Setup Instructions
 
-1. **Install Python 3.10:** Ensure you have Python 3.10 installed on your system. You can download it from the official Python website. 📥
-2. **Clone the Repository:** Clone this repository to your local machine or download the source code. 📂
-3. **Check Chrome Version:** Before installing ChromeDriver, it's important to check your current version of Google Chrome to ensure compatibility. Open Google Chrome, click on the three dots in the upper right corner to open the menu, then go to "Help" > "About Google Chrome". Your Chrome version will be displayed here. 🔍
-4. **Download ChromeDriver:** Depending on your Chrome version, download the corresponding ChromeDriver.
-   - For Chrome Version 121 or higher: [Chrome for Testing](https://googlechromelabs.github.io/chrome-for-testing/)
-   - For Chrome Version lower than 121: [ChromeDriver Downloads](https://chromedriver.chromium.org/downloads)
-   - Paste / Replace the `chromedriver.exe` inside the `'webdrivers\Chrome'` folder. 📦
-5. **Install Dependencies:** Run `pip install -r requirements.txt` in your terminal to install the necessary dependencies. 🛠️
-6. **Configure Environment Variables:** Setup your environment variables by creating a `.env` file in the root directory. Include your Discord and PokeMeow credentials, channel URL, Pokemon catching strategy dictionary, ChromeDriver path, and the URL for the captcha prediction service. ⚙️
-
-
-    Get the API-KEY 🔑: [PokeMeow Captcha Solver](https://rapidapi.com/qqqwda/api/pokemeow-captcha-solver)
+ Get your the API-KEY 🔑: [PokeMeow Captcha Solver](https://rapidapi.com/qqqwda/api/pokemeow-captcha-solver)
 
 
     Edit the `run_account_example.bat` (You can use Email and Password or Discord token):
