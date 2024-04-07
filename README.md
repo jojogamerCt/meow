@@ -34,34 +34,24 @@ The captcha solver currently boasts around a 90% accuracy rate 🎯. However, ex
     Get the API-KEY 🔑: [PokeMeow Captcha Solver](https://rapidapi.com/qqqwda/api/pokemeow-captcha-solver)
 
 
-    Create or use my `.env` file with the following structure:
+    Create or use the `run_account_example.bat` file with the following structure:
 
     ```plaintext
-    # Discord credentials
-    DISCORD_EMAIL=yourloginemail@gmail.com
-    PASSWORD=yourpassword
-
-    # Channel URL
-    CHANNEL=https://discord.com/channels/yourserverid/yourchannelid
-
-    # Pokemon catching strategy dictionary
-    POKEMON_DICTIONARY={"Legendary": "masterball", "Shiny": "masterball", "Super": "ultraball", "Rare": "greatball", "Uncommon": "pokeball", "Common": "pokeball"}
-
-    # Path to your ChromeDriver
-    DRIVER_PATH=path/to/your/chromedriver.exe
-    
-    PREDICT_CAPTCHA_URL=https://pokemeow-captcha-solver.p.rapidapi.com/predict
-
-    # Remember to set you API-KEY here
-    API_KEY=YOUR-API-KEY
-
-    RARITY_EMOJI={"Legendary": "🔮", "Shiny": "✨", "Super": "🌟", "Super Rare": "🌟", "Rare": "💎", "Uncommon": "🍀", "Common": "🌱"}
-
-    #Settings for autoplay
-    ENABLE_AUTO_BUY_BALLS=True #Recommended for new accounts
-    ENABLE_AUTO_RELEASE_DUPLICATES=False
-    ENABLE_AUTO_EGG_HATCH=True
-    ENABLE_AUTO_LOOTBOX_OPEN=True #It will open lootboxes when you have 10 or more
+    pip install -r requirements.txt
+   set SESSION_NAME=account1
+   set EMAIL=email1@gmail.com
+   set PASSWORD=strongpassword
+   set CHANNEL=https://discord.com/channels/id/channel
+   set API_KEY=RAPID-API-KEY
+   set DISCORD_TOKEN=DISCORD-TOKEN
+   set ENABLE_AUTO_BUY_BALLS=True
+   set ENABLE_AUTO_RELEASE_DUPLICATES=False
+   set ENABLE_AUTO_EGG_HATCH=True
+   set ENABLE_AUTO_LOOTBOX_OPEN=True
+   set ENABLE_FISHING=False
+   set ENABLE_BATTLE_NPC=False
+   py main.py
+   pause
     ```
 
 Replace the placeholders with your actual data.
