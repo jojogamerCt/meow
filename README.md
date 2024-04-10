@@ -20,6 +20,8 @@ The captcha solver currently boasts around a 90% accuracy rate 🎯. However, ex
 
 ## 🚀 Setup Instructions
 
+ Install Python 3.9 >
+
  Get your the API-KEY 🔑: [PokeMeow Captcha Solver](https://rapidapi.com/qqqwda/api/pokemeow-captcha-solver)
 
 
