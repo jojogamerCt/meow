@@ -785,8 +785,6 @@ class Driver:
         while True:
                         
             sleep_time = random.randint(7,9)
-            # TODO: Change
-            sleep_time = random.randint(6,7)
             # sleep_time = 7
             self.write(";p")
             
