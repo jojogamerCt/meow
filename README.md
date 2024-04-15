@@ -85,6 +85,11 @@ The captcha solver currently boasts around a 90% accuracy rate 🎯. However, ex
    ```
 To run just double click on `run_account_example.bat`  file
 
+Want to add another account? 
+
+Create another `run_account_example_2.bat`  file
+
+
 ## 📬 Contact
 
 For support, questions, or collaboration, feel free to contact me on Discord:
