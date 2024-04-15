@@ -8,8 +8,8 @@ import logging
 init()
 
 class CustomFormatter(logging.Formatter):
-
-    format = '%(asctime)s - %(levelname)s - %(message)s'
+    SESSION_NAME = os.getenv('SESSION_NAME')
+    format = f'%(asctime)s - %(levelname)s - [{SESSION_NAME}] - %(message)s'
 
     FORMATS = {
         logging.DEBUG: Fore.LIGHTBLACK_EX + format + Style.RESET_ALL,

@@ -72,6 +72,21 @@ class Driver:
         options.add_argument("--log-level=3")
         #Open the browser 800x700
         options.add_argument("--window-size=800,700")
+        # Disable notifications
+        options.add_argument("--disable-notifications")
+        # Disable infobars
+        options.add_argument("--disable-infobars")
+        # Headless mode
+        
+        # options.add_argument("--headless")
+        # options.add_argument("--disable-gpu")
+        
+        #make the driver lightweight
+        options.add_argument("--disable-extensions")
+        options.add_argument("--disable-dev-shm-usage")
+        options.add_argument("--no-sandbox")
+        options.add_argument("--mute-audio")
+        
         try:
             self.driver = webdriver.Chrome(executable_path=self.driver_path, options=options)
         except:
@@ -117,6 +132,8 @@ class Driver:
         if self.driver.current_url == "https://discord.com/channels/@me":
             logger.info("Login successful!")
         else:
+            logger.error("Login with token failed.")
+            logger.error("Login with token failed.")
             logger.error("Login with token failed.")
         
     def login(self, email, password):
@@ -178,7 +195,7 @@ class Driver:
             return captcha_service.send_image(img_path)
         except StaleElementReferenceException:
             logger.error("StaleElementReferenceException occurred. Retrying...")
-            interruptible_sleep(1)
+            time.sleep(1)
             return self.get_captcha()
       
     def get_last_element_by_user(self, username, timeout=30) -> WebElement:
@@ -263,6 +280,12 @@ class Driver:
         #Download the captcha image and send it to the API
         catch_statistics.add_captcha_encounter()
         number = self.get_captcha()
+        
+        if number is None:
+            # If the captcha number is None, try again
+            logger.error("Captcha number is None. Trying again...")
+            time.sleep(3)
+            number = self.get_captcha()
         
         # Write the captcha number in the chat
         logger.info(f"🔢 Captcha response: {number}")
@@ -576,6 +599,18 @@ class Driver:
             logger.info('🎣 [ESCAPED!] Not even a nibble...')
             return
         
+        if "You can now catch" in pokemeow_element_response.text:
+            logger.info('You can now catch Pokemon again.')
+            interruptible_sleep(3)
+            return
+            
+        if "reached your daily catch" in pokemeow_element_response.text:
+            logger.warning('You reached your daily catch limit. Stopping the bot...')
+            logger.warning('You reached your daily catch limit. Stopping the bot...')
+            logger.warning('You reached your daily catch limit. Stopping the bot...')
+            catch_statistics.print_statistics()
+            interruptible_sleep(60*60*24)
+        
         li_element = self.wait_for_element_text_to_change(pokemeow_element_response, check_every=0.2)
         
         if li_element is None:
@@ -672,6 +707,18 @@ class Driver:
             interruptible_sleep(3)
             return
         
+        if "You can now catch" in pokemeow_element_response.text:
+            logger.info('You can now catch Pokemon again.')
+            interruptible_sleep(3)
+            return
+        
+        if "reached your daily catch" in pokemeow_element_response.text:
+            logger.warning('You reached your daily catch limit. Stopping the bot...')
+            logger.warning('You reached your daily catch limit. Stopping the bot...')
+            logger.warning('You reached your daily catch limit. Stopping the bot...')
+            catch_statistics.print_statistics()
+            interruptible_sleep(60*60*24)
+    
         logger.info('[Battle] Battle started!')
         # While message not into won battle or lost battle
         while True:
@@ -700,7 +747,7 @@ class Driver:
                 logger.info("[Battle] No button found")
   
     
-    def print_initial_message(self):
+    def print_initial_message(self):        
         logger.warning("[Autplay settings] AutoBuy enabled: " + str(ENABLE_AUTO_BUY_BALLS))
         logger.warning("[Autplay settings] AutoLootbox enabled: " + str(ENABLE_AUTO_LOOTBOX))
         logger.warning("[Autplay settings] AutoRelease enabled: " + str(ENABLE_AUTO_RELEASE_DUPLICATES))
@@ -761,6 +808,18 @@ class Driver:
                 logger.error('Please catch the Pokemon you spawned first!')
                 interruptible_sleep(3)
                 continue
+            
+            if "You can now catch" in pokemeow_element_response.text:
+                logger.info('You can now catch Pokemon again.')
+                interruptible_sleep(3)
+                continue
+            
+            if "reached your daily catch" in pokemeow_element_response.text:
+                logger.warning('You reached your daily catch limit. Stopping the bot...')
+                logger.warning('You reached your daily catch limit. Stopping the bot...')
+                logger.warning('You reached your daily catch limit. Stopping the bot...')
+                catch_statistics.print_statistics()
+                interruptible_sleep(60*60*24)
             
             info_json = self.get_spawn_info(pokemeow_element_response)
             info = json.loads(info_json)
