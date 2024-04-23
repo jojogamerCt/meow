@@ -1,0 +1,11 @@
+class Action:
+    RETRY = 'retry'
+    SOLVE_CAPTCHA = 'solve_captcha'
+    WAIT = 'wait'
+    CATCH_POKEMON = 'catch_pokemon'
+    CATCH_AGAIN = 'catch_again'
+    STOP_BOT = 'stop_bot'
+    PAUSE = 'pause'
+    PROCEED = 'proceed'
+    UNKNOWN = 'unknown'
+    SKIP = 'skip'
