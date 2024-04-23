@@ -33,8 +33,10 @@ class Quest:
                         if value != "dexcaught":
                             logger.info(f"[Quest] Rerolling quest {key}...")
                             quests_element = Quest.reroll_quest(driver, key)
-                            quests_list = Quest.get_quests_list(quests_element)
                             interruptible_sleep(6)
+                            if quests_element is None:
+                                break
+                            quests_list = Quest.get_quests_list(quests_element)
                             break
             
 
@@ -74,9 +76,13 @@ class Quest:
     def reroll_quest(driver: Driver, quest_number: int):
         driver.write(f";q r {quest_number}")
         quests_element = driver.get_last_element_by_user("PokéMeow")
-        if quests_element.text == "Please wait":
-            interruptible_sleep(2.5)
+        if "Please wait" in quests_element.text:
+            interruptible_sleep(3.5)
             logger.info("[Quest Reroll] Please wait...")
             return Quest.reroll_quest(driver, quest_number)
+        
+        if "You don't have any quest reset" in quests_element.text:
+            logger.info("[Quest Reroll] You don't have any quest reset...")
+            return None
 
         return quests_element

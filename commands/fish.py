@@ -13,6 +13,7 @@ import json
 import re
 from catch_statistics import CatchStatistics
 settings = Settings()
+from helpers.handle_exception import handle_on_start_exceptions
 
 logger = Logger().get_logger()
 catch_statistics = CatchStatistics()
@@ -31,7 +32,7 @@ class Fish(ActionHandler):
         self.driver = driver
         self.logger = Logger().get_logger()
     
-    
+    @handle_on_start_exceptions
     def start(self, command:str):
         self.command = command
         self.driver.write(command)

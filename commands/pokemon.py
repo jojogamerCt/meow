@@ -13,6 +13,7 @@ import json
 import re
 from catch_statistics import CatchStatistics
 from commands.inventory import Inventory
+from helpers.handle_exception import handle_on_start_exceptions
 settings = Settings()
 
 logger = Logger().get_logger()
@@ -31,11 +32,12 @@ class Pokemon(ActionHandler):
         self.driver = driver
         self.logger = Logger().get_logger()
         self.encounter_counter = 0
-        
+    
+    @handle_on_start_exceptions
     def start(self, command:str):
         self.command = command
         self.driver.write(command)
-        pokemeow_element_response = self.driver.get_last_element_by_user("PokéMeow", timeout=30)
+        pokemeow_element_response = self.driver.get_last_element_by_user("PokéMeow", timeout=15)
         action = evaluate_response(pokemeow_element_response)
         
         if action is Action.SKIP:

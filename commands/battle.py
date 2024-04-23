@@ -1,6 +1,7 @@
 from bs4 import BeautifulSoup
 from commands.handlers.action_handler import ActionHandler
 from driver import Driver
+from helpers.handle_exception import handle_on_start_exceptions
 from validators.response_validator import evaluate_response
 from logger import Logger
 import time
@@ -10,6 +11,7 @@ from catch_statistics import CatchStatistics
 import re
 catch_statistics = CatchStatistics()
 logger = Logger().get_logger()
+from helpers.sleep_helper import interruptible_sleep
 
 
 class Battle(ActionHandler):
@@ -18,7 +20,7 @@ class Battle(ActionHandler):
         self.driver = driver
         self.logger = Logger().get_logger()
     
-    
+    @handle_on_start_exceptions
     def start(self, command:str):
         self.command = command
         
@@ -35,7 +37,9 @@ class Battle(ActionHandler):
         while True:
             last_element_html = self.driver.wait_next_message(timeout=20)
             if last_element_html is None:
-                logger.error('No response found from PokéMeow while battling...')
+                logger.error('[Battle] No response found from PokéMeow while battling...')
+                logger.warning('[Battle] Battle lost!')
+                # interruptible_sleep(8)
                 break
             time.sleep(1)
             
