@@ -3,13 +3,15 @@
 This Python application is designed to automate the process of catching Pokemons in the popular Discord game, PokéMeow. Utilizing Selenium and ChromeDriver.
 
 ## Main Features
-
-- Hunting/Pokemon: `;p` 🏹
-- Fishing: `;f` 🎣
-- Battle: `;battle npc 1` (Recommend set Wailord lvl. 100) `;team set wailord 1` ![Wailord](https://cdn.discordapp.com/emojis/722273142109896764.webp?size=44&quality=lossless)
+![Wailord](https://cdn.discordapp.com/emojis/722255594660036609.webp?size=96&quality=lossless) ![Gyarados](https://cdn.discordapp.com/emojis/722263017513025547.webp?size=96&quality=lossless) ![Wailord](https://cdn.discordapp.com/emojis/722273142109896764.webp?size=44&quality=lossless)
+- Hunting/Pokemon: `;p`
+- Fishing: `;f` 🎣 
+- Battle: `;battle npc 1` (Recommend set Wailord lvl. 100) `;team set wailord 1`
 - Captcha solver: captcha solver currently boasts around a 90% accuracy rate 🎯.
 
 ## Extra Features
+![image](https://github.com/qqqwda/pokemeow-autoplay/assets/41929135/1e80f3f0-0b75-402e-9ba1-775073bd9b22) ![image](https://github.com/qqqwda/pokemeow-autoplay/assets/41929135/bdbe953b-285d-4b8a-8faf-a02c17e9fa93)
+
 
 - Inventory check: `;inv` 🎒
 - Hatch Egg: `;egg hatch / ;egg hold` 🥚
