@@ -21,6 +21,7 @@ class Lootbox:
                 return
             items = Lootbox.extract_items(lootbox_response.get_attribute('innerHTML'))
             logger.info(f"[Lootbox] Items Earned:")
+            catch_statistics.add_lootbox_opened(Lootbox.get_lootbox_amount(inventory))
             for item in items:
                 catch_statistics.add_item_lootbox(item, items[item])
                 #print the items using tabulate
