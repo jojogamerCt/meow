@@ -25,6 +25,16 @@ This Python application is designed to automate the process of catching Pokemons
 - Daily: `;d` 
 
 
+## Commands
+
+- Press `Enter` in console to resume program.
+- Press `'p'` in console to **PAUSE** program.
+- Press `'s'` in console to **SHOW SESSION STATISTICS**.
+- Press `'b'` in console to Enable/Disable  **BATTLE** Task: `;battle npc 1`
+- Press `'f'` in console to Enable/Disable **FISHING** Task: `;f`
+- Press `'h'` in console to Enable/Disable **HUNTING/CATCHING** Task. `;p`
+
+
 ## 🚀 Setup Instructions
 
  Install Python 3.9 >
