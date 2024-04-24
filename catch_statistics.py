@@ -16,6 +16,7 @@ class CatchStatistics:
         self.total_coins = 0
         self.items_received = {}
         self.items_received_lootbox = {}
+        self.lootboxes_opened = 0
         self.hatch = {}
         self.total_hunt_encounters = 0
         self.total_fish_encounters = 0
@@ -33,6 +34,9 @@ class CatchStatistics:
         # If an item was received, increment its count
         if item is not None:
             self.items_received[item] = self.items_received.get(item, 0) + 1
+
+    def add_lootboxes_opened(self, amount=1):
+        self.lootboxes_opened += amount
 
     def add_hunt_encounter(self):
         self.total_hunt_encounters += 1
@@ -66,6 +70,7 @@ class CatchStatistics:
             "RarityCounts": self.rarity_counts,
             "TotalCoins": self.total_coins,
             "ItemsReceived": self.items_received,
+            "LootboxesOpened": self.lootboxes_opened,
             "ItemsReceivedLootbox": self.items_received_lootbox,
             "TotalHuntEncounters": self.total_hunt_encounters,
             "TotalFishEncounters": self.total_fish_encounters,

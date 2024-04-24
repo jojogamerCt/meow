@@ -30,6 +30,10 @@ class Inventory:
             logger.info("❌Failed to get inventory.")
             return
         
+        if inventory_json is None:
+            logger.info("❌Failed to get inventory, inventory None.")
+            return
+        
         if ENABLE_AUTO_EGG_HATCH:
             interruptible_sleep(2)
             Egg.actions(driver, json.loads(inventory_json))
