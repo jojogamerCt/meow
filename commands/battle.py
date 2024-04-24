@@ -12,7 +12,7 @@ import re
 catch_statistics = CatchStatistics()
 logger = Logger().get_logger()
 from helpers.sleep_helper import interruptible_sleep
-
+from selenium.common.exceptions import NoSuchElementException
 
 class Battle(ActionHandler):
     def __init__(self, driver: Driver):
@@ -36,10 +36,11 @@ class Battle(ActionHandler):
         # While message not into won battle or lost battle
         while True:
             last_element_html = self.driver.wait_next_message(timeout=20)
+            first_button = self.find_first_button(last_element_html)
             if last_element_html is None:
                 logger.error('[Battle] No response found from PokéMeow while battling...')
                 logger.warning('[Battle] Battle lost!')
-                # interruptible_sleep(8)
+                interruptible_sleep(6)
                 break
             time.sleep(1)
             
@@ -65,8 +66,6 @@ class Battle(ActionHandler):
                 logger.warning('[Battle] Battle lost!')
                 break
             time.sleep(1)
-            first_button = last_element_html.find_element(By.XPATH, ".//button")
-
             
             # Check if the button was found
             if first_button:
@@ -119,4 +118,25 @@ class Battle(ActionHandler):
                         items[item_name] = items.get(item_name, 0) + quantity
         return items
 
+
+    def find_first_button(self, last_element_html, timeout=10):
+        first_button = None
+
+        for _ in range(3):  # Retry two times
+            end_time = time.time() + timeout
+            while time.time() < end_time:
+                try:
+                    first_button = last_element_html.find_element(By.XPATH, ".//button")
+                    break  # If the button is found, break the loop
+                except NoSuchElementException:
+                    logger.warning("[Battle] No attack button found. Retrying...")
+                    time.sleep(1.5)  # If the button is not found, wait a bit before trying again
+                    last_element_html = self.driver.get_last_message_from_user("PokéMeow")  # Retry wait_next_message
+            if first_button is not None:
+                break  # If the button is found, break the outer loop
+
+        if first_button is None:
+            logger.error("[Battle] No attack button found")
+
+        return first_button
 
