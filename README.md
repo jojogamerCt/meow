@@ -2,21 +2,27 @@
 
 This Python application is designed to automate the process of catching Pokemons in the popular Discord game, PokéMeow. Utilizing Selenium and ChromeDriver.
 
-![image](https://github.com/qqqwda/pokemeow-autoplay/assets/41929135/c09acb38-34a6-4e68-9a18-08e211e89e61)
+## Main Features
 
+- Hunting/Pokemon: `;p` 🏹
+- Fishing: `;f` 🎣
+- Battle: `;battle npc 1` (Recommend set Wailord lvl. 100) `;team set wailord 1` ![Wailord](https://cdn.discordapp.com/emojis/722273142109896764.webp?size=44&quality=lossless)
+- Captcha solver: captcha solver currently boasts around a 90% accuracy rate 🎯.
 
-# [🎥 DEMO](https://www.youtube.com/watch?v=gJrNCuFWc-g&ab_channel=Crossedelboom)
+## Extra Features
 
-## ⚠️ Disclaimer
-Please note, while this bot is designed to automate tasks within PokeMeow, users are encouraged to use it responsibly and in accordance with the game's terms of service. The developer of this bot assumes no responsibility for any bans or penalties that may result from the use of this bot. Users should be aware of PokeMeow's rules and use the bot at their own risk.
+- Inventory check: `;inv` 🎒
+- Hatch Egg: `;egg hatch / ;egg hold` 🥚
+- Lootbox Open: `;lb all` 🎁
+- Quest reroll: `;q r {quest_id}` 🔄
 
+## Future Features
 
-## Updates 📢
-- **Captcha Solving Endpoint 🧩**: An update has been made to include an endpoint for Captcha Solving. This feature is now fully operational!
-- **New Captcha Solver API ✨**: We are excited to introduce a new API for captcha solving! You can find it here: [PokeMeow Captcha Solver](https://rapidapi.com/qqqwda/api/pokemeow-captcha-solver). Please note that this service might operate with some delay.
+- Research: `;res / ;res ex` 🔍
+- Catchbot: `;cb run / ;cb` 
+- Release: `;release duplicates` 🗑️
+- Daily: `;d` 
 
-## Captcha Solver Accuracy and Latency ⚙️🕒
-The captcha solver currently boasts around a 90% accuracy rate 🎯. However, expect some low latency due to hosting conditions 🐢. We are continuously working to improve this service for a smoother experience.
 
 ## 🚀 Setup Instructions
 
@@ -89,6 +95,8 @@ Want to add another account?
 
 Create another `run_account_example_2.bat`  file
 
+## ⚠️ Disclaimer
+Please note, while this bot is designed to automate tasks within PokeMeow, users are encouraged to use it responsibly and in accordance with the game's terms of service. The developer of this bot assumes no responsibility for any bans or penalties that may result from the use of this bot. Users should be aware of PokeMeow's rules and use the bot at their own risk.
 
 ## 📬 Contact
 
