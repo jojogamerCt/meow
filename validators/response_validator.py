@@ -8,8 +8,8 @@ logger = Logger().get_logger()
 def evaluate_response(pokemeow_element_response:WebElement) -> Action:
     
     if pokemeow_element_response is None:
-        logger.error('No response from PokéMeow, trying again...')
-        return Action.RETRY
+        logger.error('No response from PokéMeow, refreshing page...')
+        return Action.REFRESH
     
     if "A wild Captcha appeared!" in pokemeow_element_response.text:
         logger.warning('A wild Captcha appeared!')

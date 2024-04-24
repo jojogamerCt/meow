@@ -9,3 +9,4 @@ class Action:
     PROCEED = 'proceed'
     UNKNOWN = 'unknown'
     SKIP = 'skip'
+    REFRESH = 'refresh'

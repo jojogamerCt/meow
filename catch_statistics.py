@@ -15,6 +15,7 @@ class CatchStatistics:
         self.rarity_counts = {}
         self.total_coins = 0
         self.items_received = {}
+        self.items_received_lootbox = {}
         self.hatch = {}
         self.total_hunt_encounters = 0
         self.total_fish_encounters = 0
@@ -41,6 +42,9 @@ class CatchStatistics:
         
     def add_item(self, item, amount=1):
         self.items_received[item] = self.items_received.get(item, 0) + amount
+    
+    def add_item_lootbox(self, item, amount=1):
+        self.items_received_lootbox[item] = self.items_received_lootbox.get(item, 0) + amount
 
     def add_fish_encounter(self, tokens):
         self.total_fish_encounters += 1
@@ -62,6 +66,7 @@ class CatchStatistics:
             "RarityCounts": self.rarity_counts,
             "TotalCoins": self.total_coins,
             "ItemsReceived": self.items_received,
+            "ItemsReceivedLootbox": self.items_received_lootbox,
             "TotalHuntEncounters": self.total_hunt_encounters,
             "TotalFishEncounters": self.total_fish_encounters,
             "TotalBattlesWon": self.total_battles_won,
