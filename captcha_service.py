@@ -4,7 +4,7 @@ from logger import Logger
 from dotenv import load_dotenv
 import configparser
 import time
-logger = Logger.getInstance().get_logger()
+logger = Logger().get_logger()
 load_dotenv()
 from datetime import datetime
 

@@ -2,21 +2,38 @@
 
 This Python application is designed to automate the process of catching Pokemons in the popular Discord game, PokéMeow. Utilizing Selenium and ChromeDriver.
 
-![image](https://github.com/qqqwda/pokemeow-autoplay/assets/41929135/c09acb38-34a6-4e68-9a18-08e211e89e61)
+## Main Features
+   ![Wailord](https://cdn.discordapp.com/emojis/722255594660036609.webp?size=96&quality=lossless) ![Gyarados](https://cdn.discordapp.com/emojis/722263017513025547.webp?size=96&quality=lossless) ![Wailord](https://cdn.discordapp.com/emojis/722273142109896764.webp?size=44&quality=lossless)
+- Hunting/Pokemon: `;p`
+- Fishing: `;f` 🎣 
+- Battle: `;battle npc 1` (Recommend set Wailord lvl. 100) `;team set wailord 1`
+- Captcha solver: captcha solver currently boasts around a 90% accuracy rate 🎯.
+
+## Extra Features
 
 
-# [🎥 DEMO](https://www.youtube.com/watch?v=gJrNCuFWc-g&ab_channel=Crossedelboom)
+- Inventory check: `;inv` 🎒
+- Hatch Egg: `;egg hatch / ;egg hold` ![image](https://github.com/qqqwda/pokemeow-autoplay/assets/41929135/bdbe953b-285d-4b8a-8faf-a02c17e9fa93)
+- Lootbox Open: `;lb all` ![image](https://github.com/qqqwda/pokemeow-autoplay/assets/41929135/1e80f3f0-0b75-402e-9ba1-775073bd9b22)
+- Quest reroll: `;q r {quest_id}` 🔄 (reroll until is a catching related quest)
 
-## ⚠️ Disclaimer
-Please note, while this bot is designed to automate tasks within PokeMeow, users are encouraged to use it responsibly and in accordance with the game's terms of service. The developer of this bot assumes no responsibility for any bans or penalties that may result from the use of this bot. Users should be aware of PokeMeow's rules and use the bot at their own risk.
+## Future Features
+
+- Research: `;res / ;res ex` 🔍
+- Catchbot: `;cb run / ;cb` 
+- Release: `;release duplicates` 🗑️
+- Daily: `;d` 
 
 
-## Updates 📢
-- **Captcha Solving Endpoint 🧩**: An update has been made to include an endpoint for Captcha Solving. This feature is now fully operational!
-- **New Captcha Solver API ✨**: We are excited to introduce a new API for captcha solving! You can find it here: [PokeMeow Captcha Solver](https://rapidapi.com/qqqwda/api/pokemeow-captcha-solver). Please note that this service might operate with some delay.
+## Commands
 
-## Captcha Solver Accuracy and Latency ⚙️🕒
-The captcha solver currently boasts around a 90% accuracy rate 🎯. However, expect some low latency due to hosting conditions 🐢. We are continuously working to improve this service for a smoother experience.
+- Press `Enter` in console to resume program.
+- Press `'p'` in console to **PAUSE** program.
+- Press `'s'` in console to **SHOW SESSION STATISTICS**.
+- Press `'b'` in console to Enable/Disable  **BATTLE** Task: `;battle npc 1`
+- Press `'f'` in console to Enable/Disable **FISHING** Task: `;f`
+- Press `'h'` in console to Enable/Disable **HUNTING/CATCHING** Task. `;p`
+
 
 ## 🚀 Setup Instructions
 
@@ -28,21 +45,23 @@ The captcha solver currently boasts around a 90% accuracy rate 🎯. However, ex
    Edit the `run_account_example.bat` (You can use Email and Password or Discord token):
 
    ```plaintext
-    pip install -r requirements.txt
-   set SESSION_NAME=account1
-   set EMAIL=email1@gmail.com
-   set PASSWORD=strongpassword
-   set CHANNEL=https://discord.com/channels/id/channel
-   set API_KEY=RAPID-API-KEY
-   set DISCORD_TOKEN=DISCORD-TOKEN
-   set ENABLE_AUTO_BUY_BALLS=True
-   set ENABLE_AUTO_RELEASE_DUPLICATES=False
-   set ENABLE_AUTO_EGG_HATCH=True
-   set ENABLE_AUTO_LOOTBOX_OPEN=True
-   set ENABLE_FISHING=False
-   set ENABLE_BATTLE_NPC=False
-   py main.py
-   pause
+pip install -r requirements.txt
+set SESSION_NAME=account1
+set EMAIL=email1@gmail.com
+set PASSWORD=strongpassword
+set CHANNEL=https://discord.com/channels/id/channel
+set API_KEY=RAPID-API-KEY
+set DISCORD_TOKEN=DISCORD-TOKEN
+set ENABLE_AUTO_BUY_BALLS=True
+set ENABLE_AUTO_RELEASE_DUPLICATES=False
+set ENABLE_AUTO_EGG_HATCH=True
+set ENABLE_AUTO_LOOTBOX_OPEN=True
+set ENABLE_AUTO_QUEST_REROLL=True
+set ENABLE_FISHING=False
+set ENABLE_BATTLE_NPC=False
+set ENABLE_HUNTING=True
+py main.py %0
+pause
    ```
    Setup your settings `config.ini`
    ```plaintext
@@ -89,6 +108,8 @@ Want to add another account?
 
 Create another `run_account_example_2.bat`  file
 
+## ⚠️ Disclaimer
+Please note, while this bot is designed to automate tasks within PokeMeow, users are encouraged to use it responsibly and in accordance with the game's terms of service. The developer of this bot assumes no responsibility for any bans or penalties that may result from the use of this bot. Users should be aware of PokeMeow's rules and use the bot at their own risk.
 
 ## 📬 Contact
 

@@ -2,7 +2,6 @@ import logging
 from dotenv import load_dotenv
 import os
 from colorama import Fore, Style, init
-import logging
 
 # Initialize colorama
 init()
@@ -24,63 +23,59 @@ class CustomFormatter(logging.Formatter):
         formatter = logging.Formatter(log_fmt, datefmt='%m/%d/%Y %I:%M:%S %p')
         return formatter.format(record)
 
-
 class Logger:
     _instance = None
 
-    @staticmethod 
-    def getInstance():
-        """ Static access method. """
-        if Logger._instance == None:
-            Logger()
-        return Logger._instance
+    def __new__(cls, *args, **kwargs):
+        if not cls._instance:
+            cls._instance = super(Logger, cls).__new__(cls)
+            cls._instance.__initialized = False
+        return cls._instance
 
     def __init__(self, name=__name__):
-        """ Virtually private constructor. """
-        if Logger._instance != None:
-            raise Exception("This class is a singleton!")
-        else:
-            Logger._instance = self
+        if self.__initialized:
+            return
+        self.__initialized = True
 
-            # Load environment variables
-            load_dotenv()
+        # Load environment variables
+        load_dotenv()
 
-            # Create a custom logger
-            self.logger = logging.getLogger(name)
-            self.logger.setLevel(logging.INFO)
+        # Create a custom logger
+        self.logger = logging.getLogger(name)
+        self.logger.setLevel(logging.INFO)
 
-            # Create handlers
-            c_handler = logging.StreamHandler()
-            SESSION_NAME = os.getenv('SESSION_NAME')
-            # Create the logs folder if it doesn't exist
-            os.makedirs('logs', exist_ok=True)
+        # Create handlers
+        c_handler = logging.StreamHandler()
+        SESSION_NAME = os.getenv('SESSION_NAME', 'default_session')
+        # Create the logs folder if it doesn't exist
+        os.makedirs('logs', exist_ok=True)
 
-            # Create a FileHandler that writes to the logs folder
-            f_handler = logging.FileHandler(f'logs/{SESSION_NAME}.log', encoding='utf-8')
+        # Create a FileHandler that writes to the logs folder
+        f_handler = logging.FileHandler(f'logs/{SESSION_NAME}.log', encoding='utf-8')
 
-            c_handler.setLevel(logging.INFO)
-            c_handler.setLevel(logging.DEBUG)
-            f_handler.setLevel(logging.ERROR)
-            f_handler.setLevel(logging.INFO)
-            f_handler.setLevel(logging.DEBUG)
+        c_handler.setLevel(logging.INFO)
+        f_handler.setLevel(logging.INFO)
 
-            # Create formatters and add it to handlers
-            # c_format = logging.Formatter('%(asctime)s - %(levelname)s - %(message)s', datefmt='%m/%d/%Y %I:%M:%S %p')
-            # f_format = logging.Formatter('%(asctime)s - %(levelname)s - %(message)s', datefmt='%m/%d/%Y %I:%M:%S %p')
-            c_handler.setFormatter(CustomFormatter())
-            f_handler.setFormatter(CustomFormatter())
+        # Create formatters and add it to handlers
+        formatter = CustomFormatter()
+        c_handler.setFormatter(formatter)
+        f_handler.setFormatter(formatter)
 
-            # Add handlers to the logger
-            self.logger.addHandler(c_handler)
-            self.logger.addHandler(f_handler)
-            self.app_initialize()
+        # Add handlers to the logger
+        self.logger.addHandler(c_handler)
+        self.logger.addHandler(f_handler)
 
     def get_logger(self):
         self.logger.propagate = False
         return self.logger
     
+    def custom_info(self, message, action, action_color=Fore.RED, message_color=Fore.GREEN):
+        colored_action = f"{action_color}{action}{Style.RESET_ALL}"
+        colored_message = f"{message_color}{message}{Style.RESET_ALL}"
+        self.logger.info(f"{colored_action}: {colored_message}")
+    
     def app_initialize(self):
-        
+          
         pokemon_mew = """
                 ⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢀⣀⡀⠀⠄⣀⡀⡀⠤⠐⣢⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
                 ⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢀⣀⠠⢤⠔⠈⠀⠀⠀⠀⠀⠀⠀⠁⠀⣾⣿⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
@@ -106,65 +101,6 @@ class Logger:
                 ⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⣿⡿⠁⣆⠁⠀⠀⠀⠀⠀⠀⠀⣿⣷⢠⡸⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
                 ⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠈⠈⠁⠀⠀⠀⠀⠀⠀⠀⠀⠉⠁⠈⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
             """
-        
-        pokemon_gengar = """
-                    ⬜⬜⬜⬛⬛⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜
-                    ⬜⬜⬜⬛🟪⬛⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜
-                    ⬜⬜⬜⬛🟪🟪⬛⬛⬜⬜⬜⬛⬛⬜⬜⬜⬜⬜⬜⬜⬜⬛⬛⬛
-                    ⬜⬜⬜⬜⬛🟪🟪🟪⬛⬜⬛🟪⬛⬜⬛⬛⬜⬜⬜⬛⬛🟪🟪⬛
-                    ⬜⬜⬜⬜⬛🟪🟪🟪🟪⬛🟪🟪⬛⬛🟪⬛⬜⬛⬛🟪🟪🟪⬛⬜
-                    ⬜⬜⬜⬜⬛🟪🟪🟪⬛🟪🟪🟪⬛🟪🟪⬛⬛🟪🟪🟪🟪🟪⬛⬜
-                    ⬜⬜⬜⬜⬜⬛⬛🟪🟪🟪🟪🟪🟪🟪⬛⬛🟪🟪🟪🟪🟪⬛⬜⬜
-                    ⬜⬜⬜⬜⬜⬛🟪🟪🟪🟪🟪🟪🟪🟪🟪🟪🟪🟪🟪🟪🟪⬛⬜⬜
-                    ⬜⬜⬜⬜⬛🟪🟪🟪🟪🟪🟪🟪🟪🟪🟪🟪🟪🟪🟪🟪⬛⬜⬜⬜
-                    ⬜⬜⬛⬛🟪🟪🟪🟪🟪🟪🟪🟪🟪🟪🟪🟪🟪🟪🟪⬛🟪⬛⬛⬜
-                    ⬜⬛🟪⬛🟥🟪🟪🟪🟪🟪🟪🟪🟪🟪🟪🟪🟪🟪🟪🟪🟪🟪⬛⬜
-                    ⬛🟪🟪⬛🟥⬛🟪🟪🟪🟪🟪🟪🟥🟥🟪🟪🟪🟪⬛🟪🟪⬛⬜⬜
-                    ⬛🟪🟪⬛🟪🟪🟪🟪🟪🟥⬛🟥🟥🟪🟪🟪🟪🟪🟪⬛🟪🟪⬛⬜
-                    ⬜⬛⬛⬛⬛🟪🟪🟪🟪🟪🟥🟥🟪🟪🟪🟪🟪🟪🟪🟪⬛🟪🟪⬛
-                    ⬜⬜⬜⬛⬜⬛⬛🟪🟪🟪🟪🟪🟪⬛⬛🟪🟪🟪🟪🟪🟪⬛⬛⬜
-                    ⬜⬜⬜⬜⬛⬜⬜⬛⬛⬛⬛⬛⬛⬜🟪🟪🟪🟪🟪🟪⬛🟪⬛⬜
-                    ⬜⬜⬜⬜⬛🟪⬜⬜⬜⬜⬜⬜⬜🟪🟪🟪⬛⬛🟪🟪🟪⬛⬜⬜
-                    ⬜⬜⬜⬜⬜⬛🟪⬜⬜⬜⬜🟪🟪🟪🟪🟪🟪🟪⬛⬛⬛⬛⬜⬜
-                    ⬜⬜⬜⬜⬜⬛⬛🟪🟪🟪🟪🟪🟪🟪🟪🟪🟪🟪🟪🟪⬛🟪⬛⬜
-                    ⬜⬜⬜⬜⬜⬛🟪⬛⬛🟪🟪🟪🟪🟪🟪🟪🟪🟪🟪🟪⬛🟪🟪⬛
-                    ⬜⬜⬜⬜⬜⬜⬛🟪🟪⬛⬛🟪🟪🟪🟪🟪🟪🟪🟪⬛🟪⬛⬛⬜
-                    ⬜⬜⬜⬜⬜⬜⬜⬛⬛⬛⬜⬛⬛⬛🟪🟪🟪🟪🟪⬛⬛⬛⬜⬜
-                    ⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜⬛🟪🟪🟪⬛⬛⬜⬜⬜⬜
-                    ⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜⬛⬛⬛⬜⬜⬜⬜⬜⬜
-                    """
-                    
-        pokemon_charizard = """
-                    ⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢀⠖⡄⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
-            ⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⡤⢤⡀⠀⠀⠀⠀⢸⠀⢱⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
-            ⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠳⡀⠈⠢⡀⠀⠀⢀⠀⠈⡄⠀⠀⠀⠀⠀⠀⠀⠀⡔⠦⡀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
-            ⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢀⡤⠊⡹⠀⠀⠘⢄⠀⠈⠲⢖⠈⠀⠀⠱⡀⠀⠀⠀⠀⠀⠀⠀⠙⣄⠈⠢⣀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
-            ⠀⠀⠀⠀⠀⠀⠀⠀⠀⢀⡠⠖⠁⢠⠞⠀⠀⠀⠀⠘⡄⠀⠀⠀⠀⠀⠀⠀⢱⠀⠀⠀⠀⠀⠀⠀⠀⠈⡆⠀⠀⠉⠑⠢⢄⣀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
-            ⠀⠀⠀⠀⠀⠀⠀⡠⠚⠁⠀⠀⠀⡇⠀⠀⠀⠀⠀⢀⠇⠀⡤⡀⠀⠀⠀⢀⣼⠀⠀⠀⠀⠀⠀⠀⠀⠀⡇⢠⣾⣿⣷⣶⣤⣄⣉⠑⣄⠀⠀⠀⠀⠀⠀⠀
-            ⠀⠀⠀⠀⠀⢀⠞⢁⣴⣾⣿⣿⡆⢇⠀⠀⠀⠀⠀⠸⡀⠀⠂⠿⢦⡰⠀⠀⠋⡄⠀⠀⠀⠀⠀⠀⠀⢰⠁⣿⣿⣿⣿⣿⣿⣿⣿⣷⣌⢆⠀⠀⠀⠀⠀⠀
-            ⠀⠀⠀⠀⡴⢁⣴⣿⣿⣿⣿⣿⣿⡘⡄⠀⠀⠀⠀⠀⠱⣔⠤⡀⠀⠀⠀⠀⠀⠈⡆⠀⠀⠀⠀⠀⠀⡜⢸⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣮⢣⠀⠀⠀⠀⠀
-            ⠀⠀⠀⡼⢠⣾⣿⣿⣿⣿⣿⣿⣿⣧⡘⢆⠀⠀⠀⠀⠀⢃⠑⢌⣦⠀⠩⠉⠀⡜⠀⠀⠀⠀⠀⠀⢠⠃⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣧⣣⡀⠀⠀⠀
-            ⠀⠀⢰⢃⣾⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣦⠱⡀⠀⠀⠀⢸⠀⠀⠓⠭⡭⠙⠋⠀⠀⠀⠀⠀⠀⠀⡜⢰⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣷⡱⡄⠀⠀
-            ⠀⠀⡏⣼⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣇⢃⠀⠀⠀⢸⠀⠀⠀⠀⢰⠀⠀⠀⠀⠀⠀⠀⢀⠜⢁⣼⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣷⠘⣆⠀
-            ⠀⢸⢱⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⡘⣆⠀⠀⡆⠀⠀⠀⠀⠘⡄⠀⠀⠀⠀⡠⠖⣡⣾⠁⣸⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣧⢸⠀
-            ⠀⡏⣾⣿⣿⣿⣿⡿⡛⢟⢿⣿⣿⣿⣿⣿⣿⣧⡈⢦⣠⠃⠀⠀⠀⠀⠀⢱⣀⠤⠒⢉⣾⡉⠻⠋⠈⢘⢿⣿⣿⣿⣿⠿⣿⣿⠏⠉⠻⢿⣿⣿⣿⣿⡘⡆
-            ⢰⡇⣿⣿⠟⠁⢸⣠⠂⡄⣃⠜⣿⣿⠿⠿⣿⣿⡿⠦⡎⠀⠀⠀⠀⠀⠒⠉⠉⠑⣴⣿⣿⣎⠁⠠⠂⠮⢔⣿⡿⠉⠁⠀⠹⡛⢀⣀⡠⠀⠙⢿⣿⣿⡇⡇
-            ⠘⡇⠏⠀⠀⠀⡾⠤⡀⠑⠒⠈⠣⣀⣀⡀⠤⠋⢀⡜⣀⣠⣤⣀⠀⠀⠀⠀⠀⠀⠙⢿⡟⠉⡃⠈⢀⠴⣿⣿⣀⡀⠀⠀⠀⠈⡈⠊⠀⠀⠀⠀⠙⢿⡇⡇
-            ⠀⠿⠀⠀⠀⠀⠈⠀⠉⠙⠓⢤⣀⠀⠁⣀⡠⢔⡿⠊⠀⠀⠀⠀⠙⢦⡀⠀⠐⠢⢄⡀⠁⡲⠃⠀⡜⠀⠹⠟⠻⣿⣰⡐⣄⠎⠀⠀⠀⠀⠀⠀⠀⠀⢣⡇
-            ⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠈⠉⠉⠁⠀⡜⠀⠀⠀⠀⠀⠀⠀⠀⠱⡀⠀⠀⠀⠙⢦⣀⢀⡴⠁⠀⠀⠀⠀⠉⠁⢱⠈⢆⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
-            ⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢰⠁⠀⠀⠀⠀⠀⠀⠀⠀⠀⢱⠀⠀⠀⠀⠈⢏⠉⠀⠀⠀⠀⠀⠀⠀⠀⠀⡇⠈⡆⠀⠀⠀⠀⠀⠀⠀⠀⠀
-            ⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⡠⣿⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⡇⠀⠀⠀⠀⠀⠱⡄⠀⠀⠀⠀⠀⠀⠀⠀⡇⠀⢸⠀⠀⠀⠀⠀⠀⠀⠀⠀
-            ⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢀⡜⠀⢹⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢸⠀⠀⠀⠀⠀⠀⠘⣆⠀⠀⠀⠀⠀⠀⣰⠃⠀⠀⡇⠀⠀⠀⠀⠀⠀⠀⠀
-            ⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⡾⠀⠀⠘⣆⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠸⠁⠀⠀⠀⠀⠀⠀⠸⡄⠀⠀⠀⢀⡴⠁⠀⠀⢀⠇⠀⠀⠀⠀⠀⠀⠀⠀
-            ⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢧⠀⠀⠀⠘⢆⠀⠀⠀⠀⠀⠀⠀⠀⠀⡇⠀⠀⠀⠀⠀⠀⠀⠀⣧⣠⠤⠖⠋⠀⠀⠀⠀⡸⠀⠀⠀⠀⠀⠀⠀⠀⠀
-            ⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠈⠢⡀⠀⠀⠀⠳⢄⠀⠀⠀⠀⠀⠀⠀⢣⠀⠀⠀⠀⠀⠀⠀⠀⡏⠀⠀⠀⠀⠀⠀⢀⡴⠁⠀⠀⠀⠀⠀⠀⠀⠀⠀
-            ⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⣀⡠⠊⠈⠁⠀⠀⠀⡔⠛⠲⣤⣀⣀⣀⠀⠈⢣⡀⠀⠀⠀⠀⠀⢸⠁⠀⠀⠀⢀⡠⢔⠝⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
-            ⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠐⢈⠤⠒⣀⠀⠀⠀⠀⣀⠟⠀⠀⠀⠑⠢⢄⡀⠀⠀⠈⡗⠂⠀⠀⠀⠙⢦⠤⠒⢊⡡⠚⠁⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
-            ⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠆⠒⣒⡁⠬⠦⠒⠉⠀⠀⠀⠀⠀⠀⠀⠀⠈⠉⠒⢺⢠⠤⡀⢀⠤⡀⠠⠷⡊⠁⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
-            ⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠘⠣⡀⡱⠧⡀⢰⠓⠤⡁⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
-            ⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠈⠁⠀⠈⠃⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀"""
-        
-        
         welcome_message = f"""
             
             ██████╗░░█████╗░██╗░░██╗███████╗███╗░░░███╗███████╗░█████╗░░██╗░░░░░░░██╗ 
@@ -182,3 +118,6 @@ class Logger:
             ╚═╝░░╚═╝░╚═════╝░░░░╚═╝░░░░╚════╝░╚═╝░░░░░╚══════╝╚═╝░░╚═╝░░░╚═╝░░░
                 """
         self.logger.info(welcome_message)
+        self.logger.info("[Developer info] Keep updated on changes at Github: https://github.com/qqqwda/pokemeow-autoplay")
+        self.logger.info("[Developer info] Keep updated on changes at Github: https://github.com/qqqwda/pokemeow-autoplay")
+    

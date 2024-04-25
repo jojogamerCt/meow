@@ -3,6 +3,7 @@ import os
 import json
 SESSION_NAME = os.getenv('SESSION_NAME')
 
+
 def count_fish(pokemon_info):
     # Create the folder if it doesn't exist
     os.makedirs('json_info', exist_ok=True)

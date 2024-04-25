@@ -1,4 +1,4 @@
-class Buy:
+class Shop:
     BALL_DICTIONARY = {
         1: {"name": "Pokeball", "price": 200, "percentage_buy": 70 },
         2: {"name": "Greatball", "price": 500, "percentage_buy": 45 },
@@ -16,7 +16,7 @@ class Buy:
             # Reverse the priority order
             priority_order = priority_order[::-1]
             for id in priority_order:
-                ball = Buy.BALL_DICTIONARY[id]
+                ball = Shop.BALL_DICTIONARY[id]
                 percentage = ball["percentage_buy"]
                 #Calculate the percentage of budget for this iteration
                 percentage_of_budget = budget * (percentage / 100)
@@ -27,4 +27,3 @@ class Buy:
                 if balls_to_buy > 0:
                     commands.append(f";shop buy {id} {balls_to_buy}") 
         return commands
-
