@@ -15,7 +15,7 @@ This Python application is designed to automate the process of catching Pokemons
 - Inventory check: `;inv` 🎒
 - Hatch Egg: `;egg hatch / ;egg hold` ![image](https://github.com/qqqwda/pokemeow-autoplay/assets/41929135/bdbe953b-285d-4b8a-8faf-a02c17e9fa93)
 - Lootbox Open: `;lb all` ![image](https://github.com/qqqwda/pokemeow-autoplay/assets/41929135/1e80f3f0-0b75-402e-9ba1-775073bd9b22)
-- Quest reroll: `;q r {quest_id}` 🔄
+- Quest reroll: `;q r {quest_id}` 🔄 (reroll until is a catching related quest)
 
 ## Future Features
 
