@@ -43,7 +43,8 @@ def process_game_state(self, retry_count=0):
             self.driver.solve_captcha(pokemeow_message)
         elif pokemeow_message:
             logger.info('Continuing game play...')
-            self.start(self.command)
+            interruptible_sleep(8)
+            # self.start(self.command)
         else:
             if retry_count < max_retries:
                 logger.error('[process_game_state] No PokéMeow message found. Retrying...')

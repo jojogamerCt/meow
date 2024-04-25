@@ -36,12 +36,12 @@ class Battle(ActionHandler):
         # While message not into won battle or lost battle
         while True:
             last_element_html = self.driver.wait_next_message(timeout=20)
-            first_button = self.find_first_button(last_element_html)
             if last_element_html is None:
                 logger.error('[Battle] No response found from PokéMeow while battling...')
                 logger.warning('[Battle] Battle lost!')
                 interruptible_sleep(6)
                 break
+            first_button = self.find_first_button(last_element_html)
             time.sleep(1)
             
             if "won the battle" in last_element_html.text:

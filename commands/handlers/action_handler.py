@@ -59,6 +59,5 @@ class ActionHandler:
         if "A wild Captcha appeared!" in last_element.text:
             self.solve_captcha(driver, last_element)
         else:
-            interruptible_sleep(3)
-            self.start(self.command)
+            interruptible_sleep(8)
     
