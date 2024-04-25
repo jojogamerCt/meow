@@ -34,10 +34,19 @@ This Python application is designed to automate the process of catching Pokemons
 - Press `'b'` in console to Enable/Disable  **BATTLE** Task: `;battle npc 1`
 - Press `'f'` in console to Enable/Disable **FISHING** Task: `;f`
 - Press `'h'` in console to Enable/Disable **HUNTING/CATCHING** Task. `;p`
-
+[Here](https://www.youtube.com/watch?v=ZH7YryYCqg4)
+## 🚀 [Setup Instructions Video](https://www.youtube.com/watch?v=ZH7YryYCqg4)
+<p align="center">
+   Click on this image or https://www.youtube.com/watch?v=ZH7YryYCqg4
+</p>
+<p align="center">
+   
+  <a href="https://www.youtube.com/watch?v=ZH7YryYCqg4">
+    <img src="https://github.com/qqqwda/pokemeow-autoplay/assets/41929135/72825f7f-f059-4d1c-b8bd-42f55ae51272" width="50%">
+  </a>
+</p>
 
 ## 🚀 Setup Instructions
-
  Install Python 3.9 >
 
  Get your API-KEY 🔑: [PokeMeow Captcha Solver](https://rapidapi.com/qqqwda/api/pokemeow-captcha-solver)
