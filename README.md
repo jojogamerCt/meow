@@ -37,7 +37,7 @@ This Python application is designed to automate the process of catching Pokemons
 - Press `'b'` in console to Enable/Disable  **BATTLE** Task: `;battle npc 1`
 - Press `'f'` in console to Enable/Disable **FISHING** Task: `;f`
 - Press `'h'` in console to Enable/Disable **HUNTING/CATCHING** Task. `;p`
-[Here](https://www.youtube.com/watch?v=ZH7YryYCqg4)
+
 ## 🚀 [Setup Instructions Video](https://www.youtube.com/watch?v=ZH7YryYCqg4)
 <p align="center">
    Click on this image or https://www.youtube.com/watch?v=ZH7YryYCqg4
