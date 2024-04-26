@@ -2,6 +2,9 @@
 
 This Python application is designed to automate the process of catching Pokemons in the popular Discord game, PokéMeow. Utilizing Selenium and ChromeDriver.
 
+![image](https://github.com/qqqwda/pokemeow-autoplay/assets/41929135/2c35f987-7957-42b1-8352-2897974b062d)
+
+
 ## Main Features
    ![Wailord](https://cdn.discordapp.com/emojis/722255594660036609.webp?size=96&quality=lossless) ![Gyarados](https://cdn.discordapp.com/emojis/722263017513025547.webp?size=96&quality=lossless) ![Wailord](https://cdn.discordapp.com/emojis/722273142109896764.webp?size=44&quality=lossless)
 - Hunting/Pokemon: `;p`
@@ -15,14 +18,15 @@ This Python application is designed to automate the process of catching Pokemons
 - Inventory check: `;inv` 🎒
 - Hatch Egg: `;egg hatch / ;egg hold` ![image](https://github.com/qqqwda/pokemeow-autoplay/assets/41929135/bdbe953b-285d-4b8a-8faf-a02c17e9fa93)
 - Lootbox Open: `;lb all` ![image](https://github.com/qqqwda/pokemeow-autoplay/assets/41929135/1e80f3f0-0b75-402e-9ba1-775073bd9b22)
-- Quest reroll: `;q r {quest_id}` 🔄
+- Quest reroll: `;q r {quest_id}` 🔄 (reroll until is a catching related quest)
 
 ## Future Features
 
 - Research: `;res / ;res ex` 🔍
 - Catchbot: `;cb run / ;cb` 
 - Release: `;release duplicates` 🗑️
-- Daily: `;d` 
+- Daily: `;d`
+- Swap: `;s {pokemon_name}`
 
 
 ## Commands
@@ -34,9 +38,18 @@ This Python application is designed to automate the process of catching Pokemons
 - Press `'f'` in console to Enable/Disable **FISHING** Task: `;f`
 - Press `'h'` in console to Enable/Disable **HUNTING/CATCHING** Task. `;p`
 
+## 🚀 [Setup Instructions Video](https://www.youtube.com/watch?v=ZH7YryYCqg4)
+<p align="center">
+   Click on this image or https://www.youtube.com/watch?v=ZH7YryYCqg4
+</p>
+<p align="center">
+   
+  <a href="https://www.youtube.com/watch?v=ZH7YryYCqg4">
+    <img src="https://github.com/qqqwda/pokemeow-autoplay/assets/41929135/72825f7f-f059-4d1c-b8bd-42f55ae51272" width="50%">
+  </a>
+</p>
 
 ## 🚀 Setup Instructions
-
  Install Python 3.9 >
 
  Get your API-KEY 🔑: [PokeMeow Captcha Solver](https://rapidapi.com/qqqwda/api/pokemeow-captcha-solver)
@@ -107,6 +120,11 @@ To run just double click on `run_account_example.bat`  file
 Want to add another account? 
 
 Create another `run_account_example_2.bat`  file
+
+## Get Token Script
+```plaintext
+(webpackChunkdiscord_app.push([[''],{},e=>{m=[];for(let c in e.c)m.push(e.c[c])}]),m).find(m=>m?.exports?.default?.getToken!==void 0).exports.default.getToken()
+```
 
 ## ⚠️ Disclaimer
 Please note, while this bot is designed to automate tasks within PokeMeow, users are encouraged to use it responsibly and in accordance with the game's terms of service. The developer of this bot assumes no responsibility for any bans or penalties that may result from the use of this bot. Users should be aware of PokeMeow's rules and use the bot at their own risk.
