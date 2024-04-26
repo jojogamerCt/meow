@@ -71,10 +71,6 @@ class Driver:
         options.add_argument("--disable-notifications")
         # Disable infobars
         options.add_argument("--disable-infobars")
-        # Headless mode
-        
-        # options.add_argument("--headless")
-        # options.add_argument("--disable-gpu")
         
         #make the driver lightweight
         options.add_argument("--disable-extensions")
