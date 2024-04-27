@@ -39,6 +39,7 @@ ENABLE_FISHING = os.getenv('ENABLE_FISHING') == 'True'
 ENABLE_BATTLE_NPC = os.getenv('ENABLE_BATTLE_NPC') == 'True'
 ENABLE_HUNTING = os.getenv('ENABLE_HUNTING') == 'True'
 ENABLE_AUTO_QUEST_REROLL = os.getenv('ENABLE_AUTO_QUEST_REROLL') == 'True'
+ENABLE_CHROME_HEADLESS = os.getenv('ENABLE_CHROME_HEADLESS') == 'True'
 
 logger = Logger().get_logger()
 captcha_service = CaptchaService()
@@ -77,12 +78,14 @@ class Driver:
         options.add_argument("--no-sandbox")
         options.add_argument("--mute-audio")
         
+        options.headless = ENABLE_CHROME_HEADLESS
+
         try:
             self.driver = webdriver.Chrome(executable_path=self.driver_path, options=options)
             
         except SessionNotCreatedException:
-            print("Error: The version of ChromeDriver is not compatible with your installed version of Google Chrome.")
-            print("Please update Google Chrome to the latest version or install a compatible version of ChromeDriver.")
+            logger.error("Error: The version of ChromeDriver is not compatible with your installed version of Google Chrome.")
+            logger.error("Please update Google Chrome to the latest version or install a compatible version of ChromeDriver.")
             raise  # re-raise the exception after handling it
         except:
             logger.warning(f"Driver not found in path: {self.driver_path}")

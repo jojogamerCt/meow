@@ -13,5 +13,6 @@ set ENABLE_AUTO_QUEST_REROLL=True
 set ENABLE_FISHING=False
 set ENABLE_BATTLE_NPC=False
 set ENABLE_HUNTING=True
+set ENABLE_CHROME_HEADLESS=False
 py main.py %0
 pause
