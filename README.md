@@ -26,7 +26,7 @@ This Python application is designed to automate the process of catching Pokemons
 - Catchbot: `;cb run / ;cb` 
 - Release: `;release duplicates` 🗑️
 - Daily: `;d`
-- Swap: `;s {pokemon_name}`
+- Swap: `;swap {pokemon_name}`
 
 
 ## Commands
