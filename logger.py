@@ -8,7 +8,7 @@ init()
 
 class CustomFormatter(logging.Formatter):
     SESSION_NAME = os.getenv('SESSION_NAME')
-    format = f'%(asctime)s - %(levelname)s - [{SESSION_NAME}] - %(message)s'
+    format = f'%(asctime)s - [{SESSION_NAME}] - %(message)s'
 
     FORMATS = {
         logging.DEBUG: Fore.LIGHTBLACK_EX + format + Style.RESET_ALL,
@@ -118,6 +118,5 @@ class Logger:
             ╚═╝░░╚═╝░╚═════╝░░░░╚═╝░░░░╚════╝░╚═╝░░░░░╚══════╝╚═╝░░╚═╝░░░╚═╝░░░
                 """
         self.logger.info(welcome_message)
-        self.logger.info("[Developer info] Keep updated on changes at Github: https://github.com/qqqwda/pokemeow-autoplay")
         self.logger.info("[Developer info] Keep updated on changes at Github: https://github.com/qqqwda/pokemeow-autoplay")
     

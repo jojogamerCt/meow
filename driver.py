@@ -13,6 +13,8 @@ from selenium.webdriver.common.keys import Keys
 from selenium.common.exceptions import SessionNotCreatedException
 import random
 import json
+import colorama
+from colorama import Fore, Back, Style
 from selenium.webdriver.remote.webelement import WebElement
 from selenium.common.exceptions import NoSuchElementException
 from selenium.common.exceptions import StaleElementReferenceException
@@ -39,6 +41,7 @@ ENABLE_FISHING = os.getenv('ENABLE_FISHING') == 'True'
 ENABLE_BATTLE_NPC = os.getenv('ENABLE_BATTLE_NPC') == 'True'
 ENABLE_HUNTING = os.getenv('ENABLE_HUNTING') == 'True'
 ENABLE_AUTO_QUEST_REROLL = os.getenv('ENABLE_AUTO_QUEST_REROLL') == 'True'
+ENABLE_RUN_PICTURES = os.getenv('ENABLE_RUN_PICTURES') == 'True'
 
 logger = Logger().get_logger()
 captcha_service = CaptchaService()
@@ -65,8 +68,8 @@ class Driver:
         # Set up Chrome options
         options = Options()
         options.add_argument("--log-level=3")
-        #Open the browser 800x700
-        options.add_argument("--window-size=800,700")
+        #Open the browser 1000x1000
+        options.add_argument("--window-size=1000,1000")
         # Disable notifications
         options.add_argument("--disable-notifications")
         # Disable infobars
@@ -447,6 +450,7 @@ class Driver:
             return None
 
     def print_initial_message(self):
+        logger.warning(f"{Fore.GREEN}Autplay Settings:{Style.RESET_ALL}")
         logger.warning("[Autplay settings] AutoBuy enabled: " + str(ENABLE_AUTO_BUY_BALLS))
         logger.warning("[Autplay settings] AutoLootbox enabled: " + str(ENABLE_AUTO_LOOTBOX))
         logger.warning("[Autplay settings] AutoRelease enabled: " + str(ENABLE_AUTO_RELEASE_DUPLICATES))
@@ -455,6 +459,8 @@ class Driver:
         logger.warning("[Autplay settings] [FISHING] enabled: " + str(ENABLE_FISHING))
         logger.warning("[Autplay settings] [BATTLE] enabled: " + str(ENABLE_BATTLE_NPC))
         logger.warning("[Autplay settings] [HUNTING] enabled: " + str(ENABLE_HUNTING))
+        logger.warning("[Autplay settings] RunPictures enabled: " + str(ENABLE_RUN_PICTURES))
+        logger.warning(f"{Fore.GREEN}Autplay Advice:{Style.RESET_ALL}")
         logger.warning("[Autplay Advice] you can pause the bot by pressing 'p' in the console")
         logger.warning("[Autplay Advice] you can see statistics by pressing 's' in the console")
         logger.warning("[Autplay Advice] you can resume the bot by pressing 'enter' in the console")
@@ -462,15 +468,35 @@ class Driver:
         logger.warning("[Autplay Advice] you ENABLE/DISABLE [BATTLE] by pressing 'b' in the console")
         logger.warning("[Autplay Advice] you ENABLE/DISABLE [FISHING] by pressing 'f' in the console")
         logger.warning("[Autplay Advice] you ENABLE/DISABLE [HUNTING] by pressing 'h' in the console")
+        logger.warning(f"{Fore.GREEN}Config.ini Settings:{Style.RESET_ALL}")
         logger.warning('[config.ini] Default ball for Fishing: %s', fishing_ball)
         logger.warning('[config.ini] Default ball for Pokemons with Held Items: %s', hunt_item_ball)
         logger.warning('[config.ini] Default ball for Shinies or Golden while Fishing: %s', fish_shiny_golden_ball)
         logger.warning("="*60 + "\n")      
         API_KEY = os.getenv('API_KEY')
+        welcome_message = f"""
+        {Fore.LIGHTMAGENTA_EX}
+            
+            ██████╗░░█████╗░██╗░░██╗███████╗███╗░░░███╗███████╗░█████╗░░██╗░░░░░░░██╗ 
+            ██╔══██╗██╔══██╗██║░██╔╝██╔════╝████╗░████║██╔════╝██╔══██╗░██║░░██╗░░██║
+            ██████╔╝██║░░██║█████═╝░█████╗░░██╔████╔██║█████╗░░██║░░██║░╚██╗████╗██╔╝
+            ██╔═══╝░██║░░██║██╔═██╗░██╔══╝░░██║╚██╔╝██║██╔══╝░░██║░░██║░░████╔═████║░
+            ██║░░░░░╚█████╔╝██║░╚██╗███████╗██║░╚═╝░██║███████╗╚█████╔╝░░╚██╔╝░╚██╔╝░
+            ╚═╝░░░░░░╚════╝░╚═╝░░╚═╝╚══════╝╚═╝░░░░░╚═╝╚══════╝░╚════╝░░░░╚═╝░░░╚═╝░░
+            
+            ░█████╗░██╗░░░██╗████████╗░█████╗░██████╗░██╗░░░░░░█████╗░██╗░░░██╗
+            ██╔══██╗██║░░░██║╚══██╔══╝██╔══██╗██╔══██╗██║░░░░░██╔══██╗╚██╗░██╔╝
+            ███████║██║░░░██║░░░██║░░░██║░░██║██████╔╝██║░░░░░███████║░╚████╔╝░
+            ██╔══██║██║░░░██║░░░██║░░░██║░░██║██╔═══╝░██║░░░░░██╔══██║░░╚██╔╝░░
+            ██║░░██║╚██████╔╝░░░██║░░░╚█████╔╝██║░░░░░███████╗██║░░██║░░░██║░░░
+            ╚═╝░░╚═╝░╚═════╝░░░░╚═╝░░░░╚════╝░╚═╝░░░░░╚══════╝╚═╝░░╚═╝░░░╚═╝░░░
+        {Style.RESET_ALL}
+        """
+        print(welcome_message)
+        
+        API_KEY = os.getenv('API_KEY')
         #Check that api key len is up to 20
         if len(API_KEY) < 20:
-            logger.error("API_KEY not found. Please add your API_KEY in the .env file !")
-            logger.error("API_KEY not found. Please add your API_KEY in the .env file !")
             logger.error("API_KEY not found. Please add your API_KEY in the .env file !")
             logger.error("Quitting driver !")
             self.driver.quit()

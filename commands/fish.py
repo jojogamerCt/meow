@@ -5,11 +5,22 @@ from helpers.sleep_helper import interruptible_sleep
 from validators.response_validator import evaluate_response
 from logger import Logger
 import time
+from commands.screenshots import ScreenshotHandler
+import os
+import mss
+import pygetwindow as gw
+from driver import ENABLE_RUN_PICTURES
+import pyautogui
+from pyautogui import moveTo
+from pywinauto import Application
+from datetime import datetime
 from validators.action import Action
 from selenium.webdriver.common.by import By
 from selenium.common.exceptions import NoSuchElementException
 from settings import Settings
 import json
+import colorama
+from colorama import Fore, Back, Style
 import re
 from catch_statistics import CatchStatistics
 settings = Settings()
@@ -31,7 +42,7 @@ class Fish(ActionHandler):
         super().__init__()
         self.driver = driver
         self.logger = Logger().get_logger()
-    
+        self.screenshot_handler = None
     @handle_on_start_exceptions
     def start(self, command:str):
         self.command = command
@@ -63,7 +74,7 @@ class Fish(ActionHandler):
             encounter_element = self.driver.wait_for_element_text_to_change(li_element, check_every=1)
             
             if "The Pokemon got away" in encounter_element.text:
-                logger.info(f'🎣 [ESCAPED!] The Pokemon got away.')
+                logger.info(f'{Fore.RED}🎣⚠️ The Pokemon got away...{Style.RESET_ALL}')
                 return
             
             spawn_info = self.get_spawn_info(encounter_element.get_attribute('outerHTML'))
@@ -89,7 +100,7 @@ class Fish(ActionHandler):
             return
         except NoSuchElementException as e:
             
-            logger.info(f'🎣 [ESCAPED!] No fish found.')
+            logger.info(f'{Fore.RED}🎣⚠️ Not Even A Nibble...{Style.RESET_ALL}')
             return
 
 
@@ -116,33 +127,75 @@ class Fish(ActionHandler):
                     
                 pokemon_info["Shiny"] = False
                 pokemon_info["Golden"] = False
+                pokemon_info["Legendary"] = False
                 
                 if "shiny" in pokemon_info["Name"].lower():
                     pokemon_info["Shiny"] = True
                     
                 if "golden" in pokemon_info["Name"].lower():
                     pokemon_info["Golden"] = True
+
+                if "legendary" in pokemon_info["Name"].lower():
+                    pokemon_info["Legendary"] = True
         # print(pokemon_info)
         
         return pokemon_info
     
+    def load_pokemon_info(self):
+        with open(os.path.join(os.path.dirname(__file__), 'pokemon_info.json'), 'r') as f:
+            return json.load(f)
     
+    def get_all_chrome_windows(self):
+        try:
+            all_windows = gw.getWindowsWithTitle(' - Google Chrome')
+        except Exception as e:
+            print(f"Error getting Chrome windows: {e}")
+            all_windows = []
+        return all_windows
+
     def get_catch_result(self, pokemon_info, count, element):
         if isinstance(pokemon_info, str):
             pokemon_info = json.loads(pokemon_info)
 
         soup = BeautifulSoup(element.get_attribute('outerHTML'), "html.parser")
         pokemon_was_catched = soup.find_all(string=lambda text: '✅' in text)
+        
+        rarity_color = {
+            'Common': Fore.WHITE,
+            'Uncommon': Fore.WHITE,
+            'Rare': Fore.WHITE,
+            'Super Rare': Fore.CYAN,
+            'Legendary': Fore.MAGENTA,
+            'Shiny': Fore.YELLOW,
+            'Golden': Fore.YELLOW
+        }
+        
+        # Load the Pokemon info from the JSON file
+        with open(os.path.join(os.path.dirname(__file__), 'pokemon_info.json'), 'r') as f:
+            pokemon_info_from_file = json.load(f)
 
         # Get the Pokemon name and rarity from pokemon_info
-        pokemon_name = pokemon_info.get('Name')
-        pokemon_rarity = pokemon_info.get('Rarity')
+        if 'Name' in pokemon_info:
+            pokemon_name = pokemon_info['Name'].lower()
+        else:
+            return
+        # Check if pokemon_name exists in pokemon_info_dict and 'Rarity' exists in pokemon_info_dict[pokemon_name]
+        pokemon_info_dict = self.load_pokemon_info()
+
+        if pokemon_name in pokemon_info_dict and 'Rarity' in pokemon_info_dict[pokemon_name]:
+            pokemon_rarity = pokemon_info_dict[pokemon_name]['Rarity']
+        else:
+            print(f"{pokemon_name} not found in pokemon_info_dict or 'Rarity' not found in pokemon_info_dict[{pokemon_name}]")
+            return
+        
+        # Assuming pokemon_rarity is a string like 'Common', 'Uncommon', etc.
+        pokemon_rarity = pokemon_rarity.strip()
+        pokemon_rarity_color = rarity_color[pokemon_rarity]
+                
         has_item = pokemon_info.get('Item')
-        emoji = rarity_emoji.get(pokemon_rarity, '')
 
         if pokemon_was_catched:
             footer_text = soup.find('div', class_='embedFooter_c26cec').get_text(strip=True)
-            footer_text = soup.select_one('div[class*=embedFooter]').get_text(strip=True)
             fishing_tokens_match = re.search(r'earned (\d+) Fishing Token', footer_text)
 
             # Initialize fishing_tokens to 0, then update if found in the text
@@ -154,19 +207,85 @@ class Fish(ActionHandler):
             #Print if shiny or golden fish, if golden print a golden emoji 🟡 if shiny print a shiny emoji
             catch_statistics.add_fish_encounter(fishing_tokens)
             if pokemon_info["Shiny"]:
-                logger.info(f'🎣 [CATCHED!] {emoji} {pokemon_name} | Fishing Tokens: {fishing_tokens}'
-                            f' | Shiny: ✨')
+                logger.info(f'🎣✨ {Fore.GREEN}Fished a{Style.RESET_ALL} {pokemon_rarity_color}{pokemon_rarity}{pokemon_name}{Style.RESET_ALL} {Fore.GREEN}with{Style.RESET_ALL} {Fore.YELLOW}{fishing_tokens} Fishing Tokens{Style.RESET_ALL}')
                 return {'caught': True, 'fishing_tokens': fishing_tokens}
             elif pokemon_info["Golden"]:
-                logger.info(f'🎣 [CATCHED!] {emoji} {pokemon_name} | Fishing Tokens: {fishing_tokens}'
-                            f' | Golden: 🟡')
+                logger.info(f'🎣🟡 {Fore.GREEN}Fished a{Style.RESET_ALL} {pokemon_rarity_color}{pokemon_rarity}{pokemon_name}{Style.RESET_ALL} {Fore.GREEN}with{Style.RESET_ALL} {Fore.YELLOW}{fishing_tokens} Fishing Tokens{Style.RESET_ALL}')
                 return {'caught': True, 'fishing_tokens': fishing_tokens}
+            elif pokemon_info["Legendary"]:
+                logger.info(f'🎣🔔 {Fore.GREEN}Fished a{Style.RESET_ALL} {pokemon_rarity_color}{pokemon_rarity}{pokemon_name}{Style.RESET_ALL} {Fore.GREEN}with{Style.RESET_ALL} {Fore.YELLOW}{fishing_tokens} Fishing Tokens{Style.RESET_ALL}')
+                return {'caught': True, 'fishing_tokens': fishing_tokens}
+
+            # Check if the Pokemon is legendary, shiny, or golden
+            if pokemon_info in ['Legendary', 'Shiny', 'Golden'] and ENABLE_RUN_PICTURES:
+                
+                # Get all currently open window titles
+                all_windows = self.get_all_chrome_windows()
+
+                # Filter the windows to keep only the ones whose title starts with 'Discord | '
+                discord_windows = list(filter(lambda w: 'Discord | #' in w.title, all_windows))
+
+                # Get the first Discord window
+                window = discord_windows[0] if discord_windows else None
+
+                if window is None:
+                    print("No Discord window found")
+                    print(f'Caught a {pokemon_info["Rarity"]} Pokemon: {pokemon_name}')
+                    return
+
+                # Connect to the window using pywinauto
+                app = Application().connect(handle=window._hWnd)
+
+                # Connect to the window using pywinauto
+                app = Application().connect(handle=window._hWnd)
+
+                # Bring the window to the foreground
+                app.top_window().set_focus()
+
+                # Wait for a moment to let the window come to the foreground
+                time.sleep(1)
+
+                # Get the window's location
+                x, y, width, height = window.left, window.top, window.width, window.height
+
+                # Get the current time
+                now = datetime.now()
+
+                # Format the time in 12-hour format
+                time_string = now.strftime("%I_%M_%S_%p")
+
+                # Use time_string in your string
+                screenshot_path = f'screenshots/{pokemon_name}_{time_string}.png'
+
+                # Ensure the directory exists
+                os.makedirs(os.path.dirname(screenshot_path), exist_ok=True)
+
+                # Calculate the center of the window
+                center_x = x + width // 2
+                center_y = y + height // 2
+
+                # Move the cursor to the center of the window
+                moveTo(center_x, center_y)
+
+                # Take a screenshot of the window
+                with mss.mss() as sct:
+                    screenshot = sct.grab({"top": y, "left": x, "width": width, "height": height})
+                    png_data = mss.tools.to_png(screenshot.rgb, screenshot.size)
+                    # Ensure the directory exists
+                    os.makedirs(os.path.dirname(screenshot_path), exist_ok=True)
+
+                    # Write the PNG data to a file
+                    with open(screenshot_path, 'wb') as f:
+                        f.write(png_data)
+
+                # Log that a screenshot was taken
+                logger.info(f'{Fore.YELLOW}Screenshot taken of{Style.RESET_ALL} {Fore.GREEN}{pokemon_name}{Style.RESET_ALL} {Fore.YELLOW}and saved as {screenshot_path}{Style.RESET_ALL}')
             
             # If the Pokémon was caught, log and return that information
-            logger.info(f'🎣 [CATCHED!] Pokemon: {pokemon_name} | Fishing Tokens: {fishing_tokens}')
+            logger.info(f'🎣 {Fore.GREEN}Fished a{Style.RESET_ALL} {pokemon_rarity_color}{pokemon_rarity} {pokemon_name}{Style.RESET_ALL} {Fore.GREEN}with{Style.RESET_ALL} {Fore.YELLOW}{fishing_tokens} Fishing Tokens{Style.RESET_ALL}')
             return {'caught': True, 'fishing_tokens': fishing_tokens}
         else:
             # If the Pokémon was not caught, log and return that information
-            logger.info(f'🎣 [ESCAPED!] Pokemon: {pokemon_name}')
+            logger.info(f'🎣 {Fore.RED}A{Style.RESET_ALL} {pokemon_rarity_color}{pokemon_rarity} {pokemon_name}{Style.RESET_ALL} {Fore.RED}has failed to fish{Style.RESET_ALL}')
             catch_statistics.add_fish_encounter(0)
             return {'caught': False, 'fishing_tokens': 0}

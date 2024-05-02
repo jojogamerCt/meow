@@ -6,8 +6,15 @@ class Shop:
         4: {"name": "Masterball", "price": 100000, "percentage_buy": 80 }
     }
 
+    ENABLE_AUTO_BUY_BALLS = True
+
     @staticmethod
     def generate_purchase_commands(budget):
+        if Shop.ENABLE_AUTO_BUY_BALLS:
+            commands = Shop.generate_purchase_commands(budget)
+        else:
+            commands = []
+
         commands = []
         if budget > 2500:
             # The order of priority
