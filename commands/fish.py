@@ -42,7 +42,9 @@ class Fish(ActionHandler):
         super().__init__()
         self.driver = driver
         self.logger = Logger().get_logger()
-        self.screenshot_handler = None
+        self.screenshot_handler = ScreenshotHandler(driver)
+        self.pokemon_info_dict = self.load_pokemon_info()
+        
     @handle_on_start_exceptions
     def start(self, command:str):
         self.command = command
@@ -143,15 +145,9 @@ class Fish(ActionHandler):
     
     def load_pokemon_info(self):
         with open(os.path.join(os.path.dirname(__file__), 'pokemon_info.json'), 'r') as f:
-            return json.load(f)
+            pokemon_info_dict = json.load(f)
+            return pokemon_info_dict
     
-    def get_all_chrome_windows(self):
-        try:
-            all_windows = gw.getWindowsWithTitle(' - Google Chrome')
-        except Exception as e:
-            print(f"Error getting Chrome windows: {e}")
-            all_windows = []
-        return all_windows
 
     def get_catch_result(self, pokemon_info, count, element):
         if isinstance(pokemon_info, str):
@@ -177,13 +173,9 @@ class Fish(ActionHandler):
         # Get the Pokemon name and rarity from pokemon_info
         if 'Name' in pokemon_info:
             pokemon_name = pokemon_info['Name'].lower()
-        else:
-            return
-        # Check if pokemon_name exists in pokemon_info_dict and 'Rarity' exists in pokemon_info_dict[pokemon_name]
-        pokemon_info_dict = self.load_pokemon_info()
 
-        if pokemon_name in pokemon_info_dict and 'Rarity' in pokemon_info_dict[pokemon_name]:
-            pokemon_rarity = pokemon_info_dict[pokemon_name]['Rarity']
+        if pokemon_name in self.pokemon_info_dict and 'Rarity' in self.pokemon_info_dict[pokemon_name]:
+            pokemon_rarity = self.pokemon_info_dict[pokemon_name]['Rarity']
         else:
             print(f"{pokemon_name} not found in pokemon_info_dict or 'Rarity' not found in pokemon_info_dict[{pokemon_name}]")
             return
@@ -217,69 +209,8 @@ class Fish(ActionHandler):
                 return {'caught': True, 'fishing_tokens': fishing_tokens}
 
             # Check if the Pokemon is legendary, shiny, or golden
-            if pokemon_info in ['Legendary', 'Shiny', 'Golden'] and ENABLE_RUN_PICTURES:
-                
-                # Get all currently open window titles
-                all_windows = self.get_all_chrome_windows()
-
-                # Filter the windows to keep only the ones whose title starts with 'Discord | '
-                discord_windows = list(filter(lambda w: 'Discord | #' in w.title, all_windows))
-
-                # Get the first Discord window
-                window = discord_windows[0] if discord_windows else None
-
-                if window is None:
-                    print("No Discord window found")
-                    print(f'Caught a {pokemon_info["Rarity"]} Pokemon: {pokemon_name}')
-                    return
-
-                # Connect to the window using pywinauto
-                app = Application().connect(handle=window._hWnd)
-
-                # Connect to the window using pywinauto
-                app = Application().connect(handle=window._hWnd)
-
-                # Bring the window to the foreground
-                app.top_window().set_focus()
-
-                # Wait for a moment to let the window come to the foreground
-                time.sleep(1)
-
-                # Get the window's location
-                x, y, width, height = window.left, window.top, window.width, window.height
-
-                # Get the current time
-                now = datetime.now()
-
-                # Format the time in 12-hour format
-                time_string = now.strftime("%I_%M_%S_%p")
-
-                # Use time_string in your string
-                screenshot_path = f'screenshots/{pokemon_name}_{time_string}.png'
-
-                # Ensure the directory exists
-                os.makedirs(os.path.dirname(screenshot_path), exist_ok=True)
-
-                # Calculate the center of the window
-                center_x = x + width // 2
-                center_y = y + height // 2
-
-                # Move the cursor to the center of the window
-                moveTo(center_x, center_y)
-
-                # Take a screenshot of the window
-                with mss.mss() as sct:
-                    screenshot = sct.grab({"top": y, "left": x, "width": width, "height": height})
-                    png_data = mss.tools.to_png(screenshot.rgb, screenshot.size)
-                    # Ensure the directory exists
-                    os.makedirs(os.path.dirname(screenshot_path), exist_ok=True)
-
-                    # Write the PNG data to a file
-                    with open(screenshot_path, 'wb') as f:
-                        f.write(png_data)
-
-                # Log that a screenshot was taken
-                logger.info(f'{Fore.YELLOW}Screenshot taken of{Style.RESET_ALL} {Fore.GREEN}{pokemon_name}{Style.RESET_ALL} {Fore.YELLOW}and saved as {screenshot_path}{Style.RESET_ALL}')
+            if pokemon_rarity in ['Legendary', 'Shiny', 'Golden'] and ENABLE_RUN_PICTURES:
+                self.screenshot_handler.take_screenshot_by_element(element, pokemon_name)
             
             # If the Pokémon was caught, log and return that information
             logger.info(f'🎣 {Fore.GREEN}Fished a{Style.RESET_ALL} {pokemon_rarity_color}{pokemon_rarity} {pokemon_name}{Style.RESET_ALL} {Fore.GREEN}with{Style.RESET_ALL} {Fore.YELLOW}{fishing_tokens} Fishing Tokens{Style.RESET_ALL}')

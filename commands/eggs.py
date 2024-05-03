@@ -77,6 +77,7 @@ class Egg:
                     logger.info(f"🐣{Fore.GREEN} A {Style.RESET_ALL}{Fore.LIGHTCYAN_EX}{pokemon_hatched}{Style.RESET_ALL} {Fore.GREEN}has been hatched!{Style.RESET_ALL}")
                     
                     
+                    
         # Check if can hold egg
         poke_egg_count = next((item['count'] for item in inventory if item['name'] == 'poke_egg'), None)
         if poke_egg_count > 0:
