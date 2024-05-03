@@ -5,13 +5,16 @@ from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from helpers.sleep_helper import interruptible_sleep
 import time
+import traceback
+
 def handle_on_start_exceptions(func):
     def wrapper(*args, **kwargs):
         self = args[0]  # Get the 'self' reference from the first argument
         try:
             return func(*args, **kwargs)
         except Exception as e:
-            logger.error(f"Exception occurred: {e}")
+            logger.error(f"An error occurred in {func.__name__}: {e}")
+            traceback.print_exc()  # Print the full stack trace
             safely_refresh_page(self)
             process_game_state(self)
     return wrapper
@@ -40,7 +43,8 @@ def process_game_state(self, retry_count=0):
             self.driver.solve_captcha(pokemeow_message)
         elif pokemeow_message:
             logger.info('Continuing game play...')
-            self.start(self.command)
+            interruptible_sleep(8)
+            # self.start(self.command)
         else:
             if retry_count < max_retries:
                 logger.error('[process_game_state] No PokéMeow message found. Retrying...')

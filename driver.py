@@ -81,7 +81,6 @@ class Driver:
         
         #make the driver lightweight
         options.add_argument("--disable-extensions")
-        options.add_argument("--disable-dev-shm-usage")
         options.add_argument("--no-sandbox")
         options.add_argument("--mute-audio")
         
@@ -449,6 +448,15 @@ class Driver:
         except TimeoutException:
             return None
 
+    def refresh(self):
+        logger.info("Refreshing the page...")
+        self.driver.refresh()
+        # Wait for the element to be visible, not just present
+        element_locator = (By.XPATH, "//span[contains(@class, 'emptyText')]")
+        WebDriverWait(self.driver, 15).until(EC.visibility_of_element_located(element_locator))
+        logger.info("Page refreshed successfully.")
+        
+        
     def print_initial_message(self):
         logger.warning(f"{Fore.GREEN}Autplay Settings:{Style.RESET_ALL}")
         logger.warning("[Autplay settings] AutoBuy enabled: " + str(ENABLE_AUTO_BUY_BALLS))
