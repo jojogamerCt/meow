@@ -7,20 +7,13 @@ from logger import Logger
 import time
 from commands.screenshots import ScreenshotHandler
 import os
-import mss
-import pygetwindow as gw
 from driver import ENABLE_RUN_PICTURES
-import pyautogui
-from pyautogui import moveTo
-from pywinauto import Application
-from datetime import datetime
 from validators.action import Action
 from selenium.webdriver.common.by import By
 from selenium.common.exceptions import NoSuchElementException
 from settings import Settings
 import json
-import colorama
-from colorama import Fore, Back, Style
+from colorama import Fore, Style
 import re
 from catch_statistics import CatchStatistics
 settings = Settings()

@@ -4,24 +4,15 @@ from driver import Driver
 from helpers.sleep_helper import interruptible_sleep
 from validators.response_validator import evaluate_response
 from logger import Logger
-import time
-import pygetwindow as gw
-import pyautogui
-import mss
 from driver import ENABLE_RUN_PICTURES
 import os
 from commands.screenshots import ScreenshotHandler
-from pywinauto import Application
-import colorama
 from validators.action import Action
-from selenium.webdriver.common.by import By
-from selenium.common.exceptions import NoSuchElementException
 from settings import Settings
 import json
 import re
-from datetime import datetime
 from pyautogui import moveTo
-from colorama import Fore, Back, Style
+from colorama import Fore, Style
 from catch_statistics import CatchStatistics
 from commands.inventory import Inventory
 from helpers.handle_exception import handle_on_start_exceptions
