@@ -5,7 +5,6 @@ captchas/
 *.log
 index.html
 test/
-*.json
 pokemon_counts.json
 *.bat
 !run_account_example.bat
