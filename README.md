@@ -73,9 +73,23 @@ set ENABLE_AUTO_QUEST_REROLL=True
 set ENABLE_FISHING=False
 set ENABLE_BATTLE_NPC=False
 set ENABLE_HUNTING=True
+set ENABLE_CHROME_HEADLESS=True
+set ENABLE_RUN_PICTURES=False
 py main.py %0
 pause
    ```
+
+- `ENABLE_AUTO_BUY_BALLS` enables `;battle npc 1`
+- `ENABLE_AUTO_RELEASE_DUPLICATES` TODO
+- `ENABLE_AUTO_EGG_HATCH` enables `;egg hold` `;egg hatch` when checks inventory
+- `ENABLE_AUTO_LOOTBOX_OPEN` enables `;lb all` when it reaches 10 lootboxes or more
+- `ENABLE_AUTO_QUEST_REROLL` enables `;q reroll [id]` (Will reroll until a hunting quest related)
+- `ENABLE_FISHING` enables `;f`
+- `ENABLE_BATTLE_NPC` enables `;battle npc 1`
+- `ENABLE_HUNTING` enables main feature `;p`
+- `ENABLE_CHROME_HEADLESS` enable this for better performance, if you enable this, the chromedriver will run in headless mode (Recommended)
+- `ENABLE_RUN_PICTURES` enable this if you want to save an image of every Legendary, Shiny or Golden that you caught, the image will be saved in `screenshots` folder
+
    Setup your settings `config.ini`
    ```plaintext
    [settings]
