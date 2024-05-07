@@ -32,13 +32,13 @@ class Battle(ActionHandler):
             self.handle_action(action, self.driver, pokemeow_element_response)
             return
         
-        logger.info('[Battle] Battle started!')
+        logger.info('⚔️ Battle started!')
         # While message not into won battle or lost battle
         while True:
             last_element_html = self.driver.wait_next_message(timeout=20)
             if last_element_html is None:
-                logger.error('[Battle] No response found from PokéMeow while battling...')
-                logger.warning('[Battle] Battle lost!')
+                logger.error('⚔️ No response found from PokéMeow while battling...')
+                logger.warning('⚔️ Battle lost!')
                 interruptible_sleep(6)
                 break
             first_button = self.find_first_button(last_element_html)
@@ -55,25 +55,25 @@ class Battle(ActionHandler):
                         catch_statistics.add_item(item, items[item])
                     # print the items and coins, if no items, print empty
                     if items:
-                        logger.info(f'[Battle] Battle won! Coins: {coins}, Items: {items}')
+                        logger.info(f'⚔️ Battle won! Coins: {coins}, Items: {items}')
                     else:
-                        logger.info(f'[Battle] Battle won! Coins: {coins}')    
+                        logger.info(f'⚔️ Battle won! Coins: {coins}')    
                     break
                 except Exception as e:
                     logger.error(f"An error occurred while extracting items and coins: {e}")
                     break
             if "lost the battle" in last_element_html.text:
-                logger.warning('[Battle] Battle lost!')
+                logger.warning('⚔️ Battle lost!')
                 break
             time.sleep(1)
             
             # Check if the button was found
             if first_button:
                 # Click the first button
-                logger.info('[Battle] Using the first attack button...')
+                logger.info('⚔️ Using the first attack button...')
                 first_button.click()
             else:
-                logger.info("[Battle] No button found")
+                logger.info("⚔️ No button found")
     
 
     def extract_coins(self, html):
@@ -136,7 +136,7 @@ class Battle(ActionHandler):
                 break  # If the button is found, break the outer loop
 
         if first_button is None:
-            logger.error("[Battle] No attack button found")
+            logger.error("⚔️ No attack button found")
 
         return first_button
 

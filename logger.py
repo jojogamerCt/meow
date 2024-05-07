@@ -119,4 +119,5 @@ class Logger:
                 """
         self.logger.info(welcome_message)
         self.logger.info("[Developer info] Keep updated on changes at Github: https://github.com/qqqwda/pokemeow-autoplay")
+        self.logger.info("[Developer info] Keep updated on changes at Github: https://github.com/qqqwda/pokemeow-autoplay")
     

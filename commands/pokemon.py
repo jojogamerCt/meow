@@ -152,6 +152,7 @@ class Pokemon(ActionHandler):
             'Uncommon': Fore.WHITE,
             'Rare': Fore.WHITE,
             'Super Rare': Fore.CYAN,
+            'Super rare': Fore.CYAN,
             'Legendary': Fore.MAGENTA,
             'Shiny': Fore.YELLOW,
             'Golden': Fore.YELLOW
@@ -226,7 +227,7 @@ class Pokemon(ActionHandler):
                 else:
                     item_received = "Unknown Item"
                 # Format the string
-                catch_message = f"🍚🎗️ {Fore.LIGHTBLUE_EX}[{count}]{Style.RESET_ALL} {Fore.GREEN}Caught a{Style.RESET_ALL} {pokemon_rarity_color}{pokemon_rarity} {pokemon_name}{Style.RESET_ALL} {Fore.GREEN}with{Style.RESET_ALL} {Fore.YELLOW}{earned_coins} Pokecoins{Style.RESET_ALL} {Fore.GREEN}and a{Style.RESET_ALL} {Fore.GREEN}{item_received}{Style.RESET_ALL}"
+                catch_message = f"🍚 {Fore.LIGHTBLUE_EX}[{count}]{Style.RESET_ALL} {Fore.GREEN}Caught a{Style.RESET_ALL} {pokemon_rarity_color}{pokemon_rarity} {pokemon_name}{Style.RESET_ALL} {Fore.GREEN}with{Style.RESET_ALL} {Fore.YELLOW}{earned_coins} Pokecoins{Style.RESET_ALL} {Fore.GREEN}and a{Style.RESET_ALL} {Fore.GREEN}{item_received}{Style.RESET_ALL} 🎗️"
 
                 # Log the message
                 logger.info(catch_message)

@@ -73,7 +73,7 @@ class Fish(ActionHandler):
                 return
             
             spawn_info = self.get_spawn_info(encounter_element.get_attribute('outerHTML'))
-            
+            ball = rarity_pokeball_mapping.get(spawn_info["Rarity"], fishing_ball)
             #IF shiny or golden fish, catch it
             if spawn_info["Shiny"] or spawn_info["Golden"]:
                 self.driver.click_on_ball(fish_shiny_golden_ball)
@@ -119,11 +119,18 @@ class Fish(ActionHandler):
 
                 # Extract Pokémon name
                 pokemon_info["Name"] = last_strong_element.get_text(strip=True)
-                    
+                pokemon_name_lower = pokemon_info["Name"].lower()
                 pokemon_info["Shiny"] = False
                 pokemon_info["Golden"] = False
                 pokemon_info["Legendary"] = False
+                rarity = self.pokemon_info_dict[pokemon_name_lower]['Rarity']
+                if pokemon_name_lower in self.pokemon_info_dict:
+                    rarity = self.pokemon_info_dict[pokemon_name_lower]['Rarity']
+                else:
+                    rarity = None  # replace with a default rarity if 'Horsea' is not in the dictionary
                 
+                
+                pokemon_info["Rarity"] = rarity
                 if "shiny" in pokemon_info["Name"].lower():
                     pokemon_info["Shiny"] = True
                     

@@ -28,8 +28,16 @@ class ScreenshotHandler:
         time_string = now.strftime("%I_%M_%S_%p")
         image_binary = element.screenshot_as_png 
         img = Image.open(io.BytesIO(image_binary))
-        #save pokemon name and date
-        screenshot_path = f"screenshots/{pokemon_name}_{time_string}.png"
+
+        # Get the absolute path of the root directory
+        root_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+
+        # Create the screenshots directory in the root directory if it doesn't exist
+        screenshots_dir = os.path.join(root_dir, 'screenshots')
+        os.makedirs(screenshots_dir, exist_ok=True)
+
+        # Save the screenshot
+        screenshot_path = os.path.join(screenshots_dir, f"{pokemon_name}_{time_string}.png")
         img.save(screenshot_path)
         logger.info(f'{Fore.YELLOW}Screenshot taken of{Style.RESET_ALL} {Fore.GREEN}{pokemon_name}{Style.RESET_ALL} {Fore.YELLOW}and saved as {screenshot_path}{Style.RESET_ALL}')
 
