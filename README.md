@@ -2,7 +2,7 @@
 
 This Python application is designed to automate the process of catching Pokemons in the popular Discord game, PokéMeow. Utilizing Selenium and ChromeDriver.
 
-![image](https://github.com/qqqwda/pokemeow-autoplay/assets/41929135/2c35f987-7957-42b1-8352-2897974b062d)
+![image](https://github.com/qqqwda/pokemeow-autoplay/assets/41929135/21d0385d-9bbf-41f5-87ff-47c189131c8f)
 
 
 ## Main Features
