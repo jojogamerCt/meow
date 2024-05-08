@@ -90,7 +90,7 @@ pause
 - `ENABLE_FISHING` enables `;f`
 - `ENABLE_BATTLE_NPC` enables `;battle npc 1`
 - `ENABLE_HUNTING` enables main feature `;p`
-- `ENABLE_HUNTING` enables explore feature `;explore grass/fire`
+- `ENABLE_EXPLORING` enables explore feature `;explore grass/fire`
 - `ENABLE_CHROME_HEADLESS` enable this for better performance, if you enable this, the chromedriver will run in headless mode (Recommended)
 - `ENABLE_RUN_PICTURES` enable this if you want to save an image of every Legendary, Shiny or Golden that you caught, the image will be saved in `screenshots` folder
 
