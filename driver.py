@@ -381,10 +381,10 @@ class Driver:
             if priority < current_priority:
                 return ball
     
-    def click_on_ball(self, ball):
+    def click_on_ball(self, ball, delay=1):
         # Attempt to find the specific ball first.
         try:
-            time.sleep(1)
+            time.sleep(delay)
             last_element_html = self.get_last_element_by_user("PokéMeow")
             balls = last_element_html.find_elements("css selector",f'img[alt="{ball}"]')
             if balls:
@@ -475,6 +475,7 @@ class Driver:
         logger.warning("[Autplay Advice] you ENABLE/DISABLE [BATTLE] by pressing 'b' in the console")
         logger.warning("[Autplay Advice] you ENABLE/DISABLE [FISHING] by pressing 'f' in the console")
         logger.warning("[Autplay Advice] you ENABLE/DISABLE [HUNTING] by pressing 'h' in the console")
+        logger.warning(f"[Autplay Advice] you ENABLE/DISABLE [EXPLORE] by pressing 'e' in the console {Fore.RED}(Only for Pokémeow patreons!){Style.RESET_ALL}")
         logger.warning(f"{Fore.GREEN}Config.ini Settings:{Style.RESET_ALL}")
         logger.warning('[config.ini] Default ball for Fishing: %s', fishing_ball)
         logger.warning('[config.ini] Default ball for Pokemons with Held Items: %s', hunt_item_ball)

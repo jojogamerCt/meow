@@ -11,7 +11,6 @@ from validators.action import Action
 from settings import Settings
 import json
 import re
-from pyautogui import moveTo
 from colorama import Fore, Style
 from catch_statistics import CatchStatistics
 from commands.inventory import Inventory

@@ -12,7 +12,7 @@ def pause_execution():
     input("")
     logger.info('Execution resumed...')
     # Sleep 3 seconds to avoid double key press
-    time.sleep(3)
+    time.sleep(1.5)
 
 def show_statistics_execution():
     logger.warning('Execution paused. Press enter to continue...')
@@ -22,7 +22,7 @@ def show_statistics_execution():
     input("")
     logger.info('Execution resumed...')
     # Sleep 3 seconds to avoid double key press
-    time.sleep(3)
+    time.sleep(1.5)
     return
 
 def switch_task_command(task, task_name):
@@ -36,7 +36,7 @@ def switch_task_command(task, task_name):
     bot.switch_task(task)
     input("")
     logger.info('Execution resumed...')
-    time.sleep(3)
+    time.sleep(1.5)
 
 
 def interruptible_sleep(sleep_time):
@@ -54,6 +54,8 @@ def interruptible_sleep(sleep_time):
         'F': (switch_task_command, bot.fishing_task, 'fishing'),
         'b': (switch_task_command, bot.battle_task, 'battle'),
         'B': (switch_task_command, bot.battle_task, 'battle'),
+        'e': (switch_task_command, bot.explore_task, 'explore'),
+        'E': (switch_task_command, bot.explore_task, 'explore'),
     }
 
     start_time = time.time()

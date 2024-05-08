@@ -161,6 +161,7 @@ class Fish(ActionHandler):
             'Uncommon': Fore.WHITE,
             'Rare': Fore.WHITE,
             'Super Rare': Fore.CYAN,
+            'Super rare': Fore.CYAN,
             'Legendary': Fore.MAGENTA,
             'Shiny': Fore.YELLOW,
             'Golden': Fore.YELLOW
