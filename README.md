@@ -10,7 +10,7 @@ This Python application is designed to automate the process of catching Pokemons
 - Hunting/Pokemon: `;p`
 - Fishing: `;f` 🎣 
 - Battle: `;battle npc 1` (Recommend set Wailord lvl. 100) `;team set wailord 1`
-- Explore: `;explore grass/fire` 🗺️ (⚠️This is only for Pokémeow patreons! This is still in beta, might change in the future)
+- Explore: `;explore grass/fire` 🗺️ (⚠️This is only for **Pokémeow patreons!** This is still in beta, might change in the future)
 - Captcha solver: captcha solver currently boasts around a 90% accuracy rate 🎯.
 
 ## Extra Features
