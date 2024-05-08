@@ -4,13 +4,14 @@ from driver import Driver
 from helpers.sleep_helper import interruptible_sleep
 from validators.response_validator import evaluate_response
 from logger import Logger
-import time
+from driver import ENABLE_RUN_PICTURES
+import os
+from commands.screenshots import ScreenshotHandler
 from validators.action import Action
-from selenium.webdriver.common.by import By
-from selenium.common.exceptions import NoSuchElementException
 from settings import Settings
 import json
 import re
+from colorama import Fore, Style
 from catch_statistics import CatchStatistics
 from commands.inventory import Inventory
 from helpers.handle_exception import handle_on_start_exceptions
@@ -26,13 +27,16 @@ rarity_emoji = settings.rarity_emoji
 fishing_ball = settings.fishing_ball
 hunt_item_ball = settings.hunt_item_ball
 fish_shiny_golden_ball = settings.fishing_shiny_golden_ball
+
 class Pokemon(ActionHandler):
     def __init__(self, driver: Driver):
         super().__init__()
         self.driver = driver
         self.logger = Logger().get_logger()
         self.encounter_counter = 0
-    
+        self.screenshot_handler = ScreenshotHandler(driver)
+        self.pokemon_info_dict = self.load_pokemon_info()
+
     @handle_on_start_exceptions
     def start(self, command:str):
         self.command = command
@@ -67,7 +71,7 @@ class Pokemon(ActionHandler):
         self.encounter_counter += 1
         catch_status_element = self.driver.wait_for_element_text_to_change(pokemeow_element_response)
         self.get_catch_result(spawn_json, self.encounter_counter, catch_status_element)
-        
+
         if spawn_info["Balls"]["Pokeballs"] <= 1 or spawn_info["Balls"]["Greatballs"] <= 1:
                     inventory = Inventory.check_inventory(self.driver)
                     self.driver.buy_balls(inventory)
@@ -129,9 +133,12 @@ class Pokemon(ActionHandler):
         
         bot.disable_task(bot.hunting_task)
         logger.warning('[Hunting] Action Hunt is disabled.')
-        logger.warning('[Hunting] Action Hunt is disabled.')
-        logger.warning('[Hunting] Action Hunt is disabled.')
     
+    def load_pokemon_info(self):
+        with open(os.path.join(os.path.dirname(__file__), 'pokemon_info.json'), 'r') as f:
+            pokemon_info_dict = json.load(f)
+            return pokemon_info_dict
+
     def get_catch_result(self, pokemon_info, count, element):
         if isinstance(pokemon_info, str):
             pokemon_info = json.loads(pokemon_info)
@@ -139,14 +146,59 @@ class Pokemon(ActionHandler):
         soup = BeautifulSoup(element.get_attribute('outerHTML'), "html.parser")
         pokemon_was_catched = soup.find_all(string=lambda text: '✅' in text)
 
-        # Get the Pokemon name and rarity from pokemon_info
-        pokemon_name = pokemon_info.get('Name')
-        pokemon_rarity = pokemon_info.get('Rarity')
+        rarity_color = {
+            'Common': Fore.WHITE,
+            'Uncommon': Fore.WHITE,
+            'Rare': Fore.WHITE,
+            'Super Rare': Fore.CYAN,
+            'Super rare': Fore.CYAN,
+            'Legendary': Fore.MAGENTA,
+            'Shiny': Fore.YELLOW,
+            'Golden': Fore.YELLOW
+        }
+
+        # Load the Pokemon info from the JSON file
+        with open(os.path.join(os.path.dirname(__file__), 'pokemon_info.json'), 'r') as f:
+            pokemon_info_from_file = json.load(f)
+
+        # Check if 'Name' is in pokemon_info before trying to access it
+        try:    
+            if 'Name' in pokemon_info:
+                pokemon_name = pokemon_info['Name'].lower()
+        except Exception as e:
+            logger.error(f"An error occurred: {e}")
+        
+        self.pokemon_info_dict = self.load_pokemon_info()
+
+        if pokemon_name in self.pokemon_info_dict and 'Rarity' in self.pokemon_info_dict[pokemon_name]:
+            pokemon_rarity = self.pokemon_info_dict[pokemon_name]['Rarity']
+        else:
+            print(f"{pokemon_name} not found in pokemon_info_dict or 'Rarity' not found in pokemon_info_dict[{pokemon_name}]")
+            return
+        # Assuming pokemon_rarity is a string like 'Common', 'Uncommon', etc.
+        pokemon_rarity = pokemon_rarity.strip()
+        pokemon_rarity_color = rarity_color[pokemon_rarity]
         has_item = pokemon_info.get('Item')
-        emoji = rarity_emoji.get(pokemon_rarity, '')
+        color = rarity_color.get(pokemon_rarity, Fore.RESET)
+
+        # Check if the Pokémon is shiny
+        is_shiny = "Shiny" in pokemon_info.get(pokemon_name, {}).get("Rarity", "").lower()
+
+        log_color = Fore.YELLOW if is_shiny else Fore.WHITE
+       
         # Check if any element contains the ✅ emoji
         if pokemon_was_catched:
-            
+            if pokemon_rarity in ['Legendary', 'Shiny', 'Golden'] and ENABLE_RUN_PICTURES:
+                self.screenshot_handler.take_screenshot_by_element(element, pokemon_name)
+                
+            # Choose the log color based on the Pokemon rarity
+            if pokemon_info["Rarity"] == "Legendary":
+                log_color = Fore.MAGENTA
+            elif pokemon_info["Rarity"] == "Super Rare":
+                log_color = Fore.CYAN
+            else:
+                log_color = Fore.YELLOW if pokemon_info.get("Shiny", False) else Fore.WHITE
+
             span = soup.find('span', class_=lambda value: value and 'embedFooterText' in value)
 
             # Get the text of the span
@@ -173,17 +225,20 @@ class Pokemon(ActionHandler):
                     item_received = item_received_span.find_next('strong').text
                 else:
                     item_received = "Unknown Item"
-                    
-                #TODO If shiny or legendary print log text in purple using colorama Fore.LIGHTMAGENTA_EX
-                
-                logger.info(f'🍚 [{count}] [CATCHED!] Rarity: {pokemon_rarity} {emoji} | Pokemon: {pokemon_name} | Earned Coins: {earned_coins} | Item: {item_received}')
+                # Format the string
+                catch_message = f"🍚 {Fore.LIGHTBLUE_EX}[{count}]{Style.RESET_ALL} {Fore.GREEN}Caught a{Style.RESET_ALL} {pokemon_rarity_color}{pokemon_rarity} {pokemon_name}{Style.RESET_ALL} {Fore.GREEN}with{Style.RESET_ALL} {Fore.YELLOW}{earned_coins} Pokecoins{Style.RESET_ALL} {Fore.GREEN}and a{Style.RESET_ALL} {Fore.GREEN}{item_received}{Style.RESET_ALL} 🎗️"
+
+                # Log the message
+                logger.info(catch_message)
                 catch_statistics.add_catch(pokemon_rarity, earned_coins, item_received)
                 return
             
             # Print the Pokemon name, rarity, and earned coins in one line
-            logger.info(f'🍚 [{count}] [CATCHED!] Rarity: {pokemon_rarity} {emoji} | Pokemon: {pokemon_name} | Earned Coins: {earned_coins}')
+            if pokemon_rarity == "Shiny":
+                logger.info(f'🍚 {Fore.LIGHTBLUE_EX}[{count}]{Style.RESET_ALL} {Fore.GREEN}Caught a{Style.RESET_ALL} {pokemon_rarity_color}{pokemon_name}{Style.RESET_ALL} {Fore.GREEN}with{Style.RESET_ALL} {Fore.YELLOW}{earned_coins} Pokecoins{Style.RESET_ALL}')
+            else:
+                logger.info(f'🍚 {Fore.LIGHTBLUE_EX}[{count}]{Style.RESET_ALL} {Fore.GREEN}Caught a{Style.RESET_ALL} {pokemon_rarity_color}{pokemon_rarity} {pokemon_name}{Style.RESET_ALL} {Fore.GREEN}with{Style.RESET_ALL} {Fore.YELLOW}{earned_coins} Pokecoins{Style.RESET_ALL}')
+            
             catch_statistics.add_catch(pokemon_rarity, earned_coins)
-            return
         else:
-            logger.info(f'🍚 [{count}] [ESCAPED!] Rarity: {pokemon_rarity} {emoji} | Pokemon: {pokemon_name}')
-            return
+            logger.info(f'🍚 {Fore.LIGHTBLUE_EX}[{count}]{Style.RESET_ALL} {Fore.RED}Failed to catch a{Style.RESET_ALL} {pokemon_rarity_color}{pokemon_rarity} {pokemon_name}{Style.RESET_ALL}')

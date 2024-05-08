@@ -4,6 +4,8 @@ from selenium.webdriver.remote.webelement import WebElement
 from helpers.sleep_helper import interruptible_sleep
 from driver import Driver
 from logger import Logger
+import colorama
+from colorama import Fore, Back, Style
 from catch_statistics import CatchStatistics
 
 catch_statistics = CatchStatistics()
@@ -64,7 +66,7 @@ class Egg:
         # logger.info(f"[Egg actions] Egg status: {egg_status}")
         if egg_status["can_hatch"]:
                 interruptible_sleep(3)
-                logger.info("🐣 Hatching egg...")
+                logger.info(f"{Fore.YELLOW}🐣 Hatching egg...{Style.RESET_ALL}")
                 driver.write(";egg hatch")
                 can_hold_egg = True
                 hatch_element = driver.get_last_element_by_user("PokéMeow", timeout=30)
@@ -72,13 +74,14 @@ class Egg:
                 if hatch_element is not None:
                     pokemon_hatched = Egg.get_hatch_result(hatch_element)
                     catch_statistics.add_hatch(pokemon_hatched)
-                    logger.info(f"🐣 [HATCHED!] {pokemon_hatched}")
+                    logger.info(f"🐣{Fore.GREEN} A {Style.RESET_ALL}{Fore.LIGHTCYAN_EX}{pokemon_hatched}{Style.RESET_ALL} {Fore.GREEN}has been hatched!{Style.RESET_ALL}")
+                    
                     
                     
         # Check if can hold egg
         poke_egg_count = next((item['count'] for item in inventory if item['name'] == 'poke_egg'), None)
         if poke_egg_count > 0:
             if egg_status["can_hold"] or can_hold_egg:
-                logger.info("🥚 Holding egg...")
+                logger.info(f"{Fore.YELLOW}🥚 Holding egg...{Style.RESET_ALL}")
                 driver.write(";egg hold")
                 interruptible_sleep(2.5)

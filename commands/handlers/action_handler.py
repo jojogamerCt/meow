@@ -21,7 +21,7 @@ class ActionHandler:
         }
         self.command = None
     
-    def start(self, command: str):
+    def start(self, command):
         raise NotImplementedError
 
 

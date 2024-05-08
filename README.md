@@ -2,7 +2,7 @@
 
 This Python application is designed to automate the process of catching Pokemons in the popular Discord game, PokéMeow. Utilizing Selenium and ChromeDriver.
 
-![image](https://github.com/qqqwda/pokemeow-autoplay/assets/41929135/2c35f987-7957-42b1-8352-2897974b062d)
+![image](https://github.com/qqqwda/pokemeow-autoplay/assets/41929135/21d0385d-9bbf-41f5-87ff-47c189131c8f)
 
 
 ## Main Features
@@ -10,6 +10,7 @@ This Python application is designed to automate the process of catching Pokemons
 - Hunting/Pokemon: `;p`
 - Fishing: `;f` 🎣 
 - Battle: `;battle npc 1` (Recommend set Wailord lvl. 100) `;team set wailord 1`
+- Explore: `;explore grass/fire` 🗺️ (⚠️This is only for **Pokémeow patreons!** This is still in beta, might change in the future and **EXPECT BUGS**)
 - Captcha solver: captcha solver currently boasts around a 90% accuracy rate 🎯.
 
 ## Extra Features
@@ -19,6 +20,7 @@ This Python application is designed to automate the process of catching Pokemons
 - Hatch Egg: `;egg hatch / ;egg hold` ![image](https://github.com/qqqwda/pokemeow-autoplay/assets/41929135/bdbe953b-285d-4b8a-8faf-a02c17e9fa93)
 - Lootbox Open: `;lb all` ![image](https://github.com/qqqwda/pokemeow-autoplay/assets/41929135/1e80f3f0-0b75-402e-9ba1-775073bd9b22)
 - Quest reroll: `;q r {quest_id}` 🔄 (reroll until is a catching related quest)
+- Screenshots: When finding a Shiny/Golden/Legendary it will take a screenshot 📷 and save it in `screenshot` folder (Set to True `ENABLE_RUN_PICTURES` to Enable)
 
 ## Future Features
 
@@ -73,9 +75,25 @@ set ENABLE_AUTO_QUEST_REROLL=True
 set ENABLE_FISHING=False
 set ENABLE_BATTLE_NPC=False
 set ENABLE_HUNTING=True
+set ENABLE_EXPLORING=False
+set ENABLE_CHROME_HEADLESS=True
+set ENABLE_RUN_PICTURES=False
 py main.py %0
 pause
    ```
+
+- `ENABLE_AUTO_BUY_BALLS` enables `;battle npc 1`
+- `ENABLE_AUTO_RELEASE_DUPLICATES` TODO
+- `ENABLE_AUTO_EGG_HATCH` enables `;egg hold` `;egg hatch` when checks inventory
+- `ENABLE_AUTO_LOOTBOX_OPEN` enables `;lb all` when it reaches 10 lootboxes or more
+- `ENABLE_AUTO_QUEST_REROLL` enables `;q reroll [id]` (Will reroll until a hunting quest related)
+- `ENABLE_FISHING` enables `;f`
+- `ENABLE_BATTLE_NPC` enables `;battle npc 1`
+- `ENABLE_HUNTING` enables main feature `;p`
+- `ENABLE_EXPLORING` enables explore feature `;explore grass/fire`
+- `ENABLE_CHROME_HEADLESS` enable this for better performance, if you enable this, the chromedriver will run in headless mode (Recommended)
+- `ENABLE_RUN_PICTURES` enable this if you want to save an image of every Legendary, Shiny or Golden that you caught, the image will be saved in `screenshots` folder
+
    Setup your settings `config.ini`
    ```plaintext
    [settings]

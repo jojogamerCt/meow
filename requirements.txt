@@ -4,4 +4,5 @@ python-dotenv
 beautifulsoup4==4.10.0
 tabulate
 colorama
+Pillow
 chromedriver_autoinstaller

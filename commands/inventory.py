@@ -57,7 +57,7 @@ class Inventory:
         #include the next page of inventory
         inventory_json_second_page = Inventory.get_inventory_json(last_element_html)
         
-        if not inventory_json_second_page:
+        if not inventory_json_second_page or inventory_json_second_page is None:
             logger.info("❌Failed to get inventory.")
             inventory = json.loads(inventory_json)
             return inventory
@@ -78,40 +78,43 @@ class Inventory:
          # Function to check if a tag contains a partial class name
         def contains_partial_class(partial):
             return re.compile(".*" + partial + ".*")
-    
-        # Check if html_content is a WebElement
-        if isinstance(html_content, WebElement):
-            html_content = html_content.get_attribute('outerHTML')
+        try:
+            # Check if html_content is a WebElement
+            if isinstance(html_content, WebElement):
+                html_content = html_content.get_attribute('outerHTML')
 
-        # print(html_content)
-        soup = BeautifulSoup(html_content, 'html.parser')
-        
-        # Initialize a list to store each item in a flat structure
-        items_list = []
-        
-        # Find all categories
-        # categories = soup.find_all("div", class_="embedFieldName_d42d0c")
-        categories = soup.find_all("div", class_=contains_partial_class("embedFieldName"))
-        
-        for category in categories:
-            category_name = category.get_text(strip=True)
-            # item_container = category.find_next_sibling("div", class_="embedFieldValue_f2dcec")
-            item_container = category.find_next_sibling("div", class_=contains_partial_class("embedFieldValue"))
+            # print(html_content)
+            soup = BeautifulSoup(html_content, 'html.parser')
+            
+            # Initialize a list to store each item in a flat structure
+            items_list = []
+            
+            # Find all categories
+            # categories = soup.find_all("div", class_="embedFieldName_d42d0c")
+            categories = soup.find_all("div", class_=contains_partial_class("embedFieldName"))
+            
+            for category in categories:
+                category_name = category.get_text(strip=True)
+                # item_container = category.find_next_sibling("div", class_="embedFieldValue_f2dcec")
+                item_container = category.find_next_sibling("div", class_=contains_partial_class("embedFieldValue"))
 
-            if item_container:
-                for item in item_container.find_all("span", class_=contains_partial_class("emojiContainer")):
-                    item_name = item.img['alt'] if item.img else "Unknown"
-                    count_text = item.find_next_sibling("strong")
-                    count = count_text.get_text(strip=True) if count_text else "0"
-                    item_dict = {
-                        "name": item_name. replace(":", "").lower(),
-                        "count": int(count.replace(",", ""))
-                    }
-                    items_list.append(item_dict)
-        
-        # Convert the list of items to JSON
-        items_json = json.dumps(items_list, indent=4)
-        return items_json
+                if item_container:
+                    for item in item_container.find_all("span", class_=contains_partial_class("emojiContainer")):
+                        item_name = item.img['alt'] if item.img else "Unknown"
+                        count_text = item.find_next_sibling("strong")
+                        count = count_text.get_text(strip=True) if count_text else "0"
+                        item_dict = {
+                            "name": item_name. replace(":", "").lower(),
+                            "count": int(count.replace(",", ""))
+                        }
+                        items_list.append(item_dict)
+            
+            # Convert the list of items to JSON
+            items_json = json.dumps(items_list, indent=4)
+            return items_json
+        except Exception as e:
+            logger.error(f"An error occurred while getting the inventory JSON: {e}")
+            return None
     
     @staticmethod
     def print_inventory(inventory):

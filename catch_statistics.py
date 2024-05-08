@@ -23,6 +23,7 @@ class CatchStatistics:
         self.total_fish_tokens = 0
         self.total_battles_won = 0
         self.total_captchas_encountered = 0
+        self.total_explore_encounters = 0
 
     def add_catch(self, rarity, coins, item=None):
         # Increment the count for this rarity
@@ -61,6 +62,9 @@ class CatchStatistics:
         self.total_battles_won += 1
         self.add_coins(coins)
         
+    def add_explore_encounter(self):
+        self.total_explore_encounters += 1
+        
     def add_hatch(self, pokemon):
         if pokemon is not None:
             self.hatch[pokemon] = self.hatch.get(pokemon, 0) + 1
@@ -74,6 +78,7 @@ class CatchStatistics:
             "ItemsReceivedLootbox": self.items_received_lootbox,
             "TotalHuntEncounters": self.total_hunt_encounters,
             "TotalFishEncounters": self.total_fish_encounters,
+            "TotalExploreEncounters": self.total_explore_encounters,
             "TotalBattlesWon": self.total_battles_won,
             "TotalFishTokens": self.total_fish_tokens,
             "TotalCaptchasEncountered": self.total_captchas_encountered,

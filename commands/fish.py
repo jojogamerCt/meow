@@ -5,11 +5,15 @@ from helpers.sleep_helper import interruptible_sleep
 from validators.response_validator import evaluate_response
 from logger import Logger
 import time
+from commands.screenshots import ScreenshotHandler
+import os
+from driver import ENABLE_RUN_PICTURES
 from validators.action import Action
 from selenium.webdriver.common.by import By
 from selenium.common.exceptions import NoSuchElementException
 from settings import Settings
 import json
+from colorama import Fore, Style
 import re
 from catch_statistics import CatchStatistics
 settings = Settings()
@@ -31,7 +35,9 @@ class Fish(ActionHandler):
         super().__init__()
         self.driver = driver
         self.logger = Logger().get_logger()
-    
+        self.screenshot_handler = ScreenshotHandler(driver)
+        self.pokemon_info_dict = self.load_pokemon_info()
+        
     @handle_on_start_exceptions
     def start(self, command:str):
         self.command = command
@@ -63,11 +69,11 @@ class Fish(ActionHandler):
             encounter_element = self.driver.wait_for_element_text_to_change(li_element, check_every=1)
             
             if "The Pokemon got away" in encounter_element.text:
-                logger.info(f'🎣 [ESCAPED!] The Pokemon got away.')
+                logger.info(f'{Fore.RED}🎣⚠️ The Pokemon got away...{Style.RESET_ALL}')
                 return
             
             spawn_info = self.get_spawn_info(encounter_element.get_attribute('outerHTML'))
-            
+            ball = rarity_pokeball_mapping.get(spawn_info["Rarity"], fishing_ball)
             #IF shiny or golden fish, catch it
             if spawn_info["Shiny"] or spawn_info["Golden"]:
                 self.driver.click_on_ball(fish_shiny_golden_ball)
@@ -89,7 +95,7 @@ class Fish(ActionHandler):
             return
         except NoSuchElementException as e:
             
-            logger.info(f'🎣 [ESCAPED!] No fish found.')
+            logger.info(f'{Fore.RED}🎣⚠️ Not Even A Nibble...{Style.RESET_ALL}')
             return
 
 
@@ -113,36 +119,76 @@ class Fish(ActionHandler):
 
                 # Extract Pokémon name
                 pokemon_info["Name"] = last_strong_element.get_text(strip=True)
-                    
+                pokemon_name_lower = pokemon_info["Name"].lower()
                 pokemon_info["Shiny"] = False
                 pokemon_info["Golden"] = False
+                pokemon_info["Legendary"] = False
+                rarity = self.pokemon_info_dict[pokemon_name_lower]['Rarity']
+                if pokemon_name_lower in self.pokemon_info_dict:
+                    rarity = self.pokemon_info_dict[pokemon_name_lower]['Rarity']
+                else:
+                    rarity = None  # replace with a default rarity if 'Horsea' is not in the dictionary
                 
+                
+                pokemon_info["Rarity"] = rarity
                 if "shiny" in pokemon_info["Name"].lower():
                     pokemon_info["Shiny"] = True
                     
                 if "golden" in pokemon_info["Name"].lower():
                     pokemon_info["Golden"] = True
+
+                if "legendary" in pokemon_info["Name"].lower():
+                    pokemon_info["Legendary"] = True
         # print(pokemon_info)
         
         return pokemon_info
     
+    def load_pokemon_info(self):
+        with open(os.path.join(os.path.dirname(__file__), 'pokemon_info.json'), 'r') as f:
+            pokemon_info_dict = json.load(f)
+            return pokemon_info_dict
     
+
     def get_catch_result(self, pokemon_info, count, element):
         if isinstance(pokemon_info, str):
             pokemon_info = json.loads(pokemon_info)
 
         soup = BeautifulSoup(element.get_attribute('outerHTML'), "html.parser")
         pokemon_was_catched = soup.find_all(string=lambda text: '✅' in text)
+        
+        rarity_color = {
+            'Common': Fore.WHITE,
+            'Uncommon': Fore.WHITE,
+            'Rare': Fore.WHITE,
+            'Super Rare': Fore.CYAN,
+            'Super rare': Fore.CYAN,
+            'Legendary': Fore.MAGENTA,
+            'Shiny': Fore.YELLOW,
+            'Golden': Fore.YELLOW
+        }
+        
+        # Load the Pokemon info from the JSON file
+        with open(os.path.join(os.path.dirname(__file__), 'pokemon_info.json'), 'r') as f:
+            pokemon_info_from_file = json.load(f)
 
         # Get the Pokemon name and rarity from pokemon_info
-        pokemon_name = pokemon_info.get('Name')
-        pokemon_rarity = pokemon_info.get('Rarity')
+        if 'Name' in pokemon_info:
+            pokemon_name = pokemon_info['Name'].lower()
+
+        if pokemon_name in self.pokemon_info_dict and 'Rarity' in self.pokemon_info_dict[pokemon_name]:
+            pokemon_rarity = self.pokemon_info_dict[pokemon_name]['Rarity']
+        else:
+            print(f"{pokemon_name} not found in pokemon_info_dict or 'Rarity' not found in pokemon_info_dict[{pokemon_name}]")
+            return
+        
+        # Assuming pokemon_rarity is a string like 'Common', 'Uncommon', etc.
+        pokemon_rarity = pokemon_rarity.strip()
+        pokemon_rarity_color = rarity_color[pokemon_rarity]
+                
         has_item = pokemon_info.get('Item')
-        emoji = rarity_emoji.get(pokemon_rarity, '')
 
         if pokemon_was_catched:
             footer_text = soup.find('div', class_='embedFooter_c26cec').get_text(strip=True)
-            footer_text = soup.select_one('div[class*=embedFooter]').get_text(strip=True)
             fishing_tokens_match = re.search(r'earned (\d+) Fishing Token', footer_text)
 
             # Initialize fishing_tokens to 0, then update if found in the text
@@ -154,19 +200,24 @@ class Fish(ActionHandler):
             #Print if shiny or golden fish, if golden print a golden emoji 🟡 if shiny print a shiny emoji
             catch_statistics.add_fish_encounter(fishing_tokens)
             if pokemon_info["Shiny"]:
-                logger.info(f'🎣 [CATCHED!] {emoji} {pokemon_name} | Fishing Tokens: {fishing_tokens}'
-                            f' | Shiny: ✨')
+                logger.info(f'🎣✨ {Fore.GREEN}Fished a{Style.RESET_ALL} {pokemon_rarity_color}{pokemon_rarity}{pokemon_name}{Style.RESET_ALL} {Fore.GREEN}with{Style.RESET_ALL} {Fore.YELLOW}{fishing_tokens} Fishing Tokens{Style.RESET_ALL}')
                 return {'caught': True, 'fishing_tokens': fishing_tokens}
             elif pokemon_info["Golden"]:
-                logger.info(f'🎣 [CATCHED!] {emoji} {pokemon_name} | Fishing Tokens: {fishing_tokens}'
-                            f' | Golden: 🟡')
+                logger.info(f'🎣🟡 {Fore.GREEN}Fished a{Style.RESET_ALL} {pokemon_rarity_color}{pokemon_rarity}{pokemon_name}{Style.RESET_ALL} {Fore.GREEN}with{Style.RESET_ALL} {Fore.YELLOW}{fishing_tokens} Fishing Tokens{Style.RESET_ALL}')
                 return {'caught': True, 'fishing_tokens': fishing_tokens}
+            elif pokemon_info["Legendary"]:
+                logger.info(f'🎣🔔 {Fore.GREEN}Fished a{Style.RESET_ALL} {pokemon_rarity_color}{pokemon_rarity}{pokemon_name}{Style.RESET_ALL} {Fore.GREEN}with{Style.RESET_ALL} {Fore.YELLOW}{fishing_tokens} Fishing Tokens{Style.RESET_ALL}')
+                return {'caught': True, 'fishing_tokens': fishing_tokens}
+
+            # Check if the Pokemon is legendary, shiny, or golden
+            if pokemon_rarity in ['Legendary', 'Shiny', 'Golden'] and ENABLE_RUN_PICTURES:
+                self.screenshot_handler.take_screenshot_by_element(element, pokemon_name)
             
             # If the Pokémon was caught, log and return that information
-            logger.info(f'🎣 [CATCHED!] Pokemon: {pokemon_name} | Fishing Tokens: {fishing_tokens}')
+            logger.info(f'🎣 {Fore.GREEN}Fished a{Style.RESET_ALL} {pokemon_rarity_color}{pokemon_rarity} {pokemon_name}{Style.RESET_ALL} {Fore.GREEN}with{Style.RESET_ALL} {Fore.YELLOW}{fishing_tokens} Fishing Tokens{Style.RESET_ALL}')
             return {'caught': True, 'fishing_tokens': fishing_tokens}
         else:
             # If the Pokémon was not caught, log and return that information
-            logger.info(f'🎣 [ESCAPED!] Pokemon: {pokemon_name}')
+            logger.info(f'🎣 {Fore.RED}A{Style.RESET_ALL} {pokemon_rarity_color}{pokemon_rarity} {pokemon_name}{Style.RESET_ALL} {Fore.RED}has failed to fish{Style.RESET_ALL}')
             catch_statistics.add_fish_encounter(0)
             return {'caught': False, 'fishing_tokens': 0}
