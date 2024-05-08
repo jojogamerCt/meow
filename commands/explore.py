@@ -91,15 +91,13 @@ class Explore(ActionHandler):
             element_updated = self.driver.wait_for_element_text_to_change(pokemeow_element_response, timeout=3, check_every=0.2)
             if element_updated is None:
                 self.logger.info(f"🗺️ Explore session has ended with {steps} steps.")
-                elements = self.driver.driver.find_elements(By.XPATH, '//img[@alt="run"]/ancestor::button')
-                last_button = elements[-1]  # Get the last button
-                last_button.click()
+                element = self.driver.get_last_message_from_user("PokéMeow")
+                self.click_on_run(element)
                 break
             if "explore session has ended" in element_updated.text:
                 self.logger.info(f"🗺️ Explore session has ended with {steps} steps.")
-                elements = self.driver.driver.find_elements(By.XPATH, '//img[@alt="run"]/ancestor::button')
-                last_button = elements[-1]  # Get the last button
-                last_button.click()
+                element = self.driver.get_last_message_from_user("PokéMeow")
+                self.click_on_run(element)
                 break
             encounter_info = self.get_pokemon_name(element_updated.get_attribute('outerHTML'))
             if encounter_info is None:
@@ -139,20 +137,6 @@ class Explore(ActionHandler):
                 logger.info(f"🗺️ {Fore.LIGHTBLUE_EX}[{steps}] {Style.RESET_ALL}{Fore.RED}Failed to catch a{Style.RESET_ALL} {color}{rarity} {pokemon_name}{Style.RESET_ALL}")
             catch_statistics.add_explore_encounter()
                 
-            
-
-    def get_encounter_info(self, element):
-        # Parse the HTML content using BeautifulSoup
-        soup = BeautifulSoup(element, 'html.parser')
-        if "No Pokemon appeared" in soup.get_text():
-            
-            return None
-        # Find the Pokémon name
-        pokemon_name = soup.find('strong').get_text()
-
-        return pokemon_name
-
-
     def get_encounter_result(self, html_content):
         soup = BeautifulSoup(html_content, 'html.parser')
         
@@ -206,4 +190,20 @@ class Explore(ActionHandler):
         with open(os.path.join(os.path.dirname(__file__), 'pokemon_info.json'), 'r') as f:
             pokemon_info_dict = json.load(f)
             return pokemon_info_dict
+        
+    def click_on_run(self, element):
+        # Iterate over each button to find the one with the specific alt text
+        buttons = element.find_elements(By.XPATH, ".//button")
+        for button in buttons:
+            try:
+                # Find the img element inside the button
+                img = button.find_element(By.TAG_NAME, 'img')
+                # Check if the img's alt attribute matches 'run'
+                if img.get_attribute('alt') == 'run':
+                    # Click the button containing the image with alt='run'
+                    button.click()
+                    break
+            except Exception as e:
+                # Handle potential errors if the img tag isn't found within the button
+                self.logger.error(f"Error processing button: {e}")
     
