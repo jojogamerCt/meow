@@ -83,11 +83,11 @@ py main.py %0
 pause
    ```
 
-- `ENABLE_AUTO_BUY_BALLS` enables `;battle npc 1`
+- `ENABLE_AUTO_BUY_BALLS` enables `;s b {ball id} {ball amount}`
 - `ENABLE_AUTO_RELEASE_DUPLICATES` TODO
 - `ENABLE_AUTO_EGG_HATCH` enables `;egg hold` `;egg hatch` when checks inventory
 - `ENABLE_AUTO_LOOTBOX_OPEN` enables `;lb all` when it reaches 10 lootboxes or more
-- `ENABLE_AUTO_QUEST_REROLL` enables `;q reroll [id]` (Will reroll until a hunting quest related)
+- `ENABLE_AUTO_QUEST_REROLL` enables `;quest reroll [id]` (Will reroll until a hunting quest related)
 - `ENABLE_FISHING` enables `;f`
 - `ENABLE_BATTLE_NPC` enables `;battle npc 1`
 - `ENABLE_HUNTING` enables main feature `;p`
