@@ -515,6 +515,10 @@ class Driver:
     
     def validate(self):
         pokemeow_last_message = self.get_last_message_from_user("PokéMeow")
+        
+        if pokemeow_last_message is None:
+            return
+        
         if "A wild Captcha appeared!" in pokemeow_last_message.text:
             logger.warning('Captcha detected!')
             self.solve_captcha(pokemeow_last_message)
