@@ -53,7 +53,7 @@ This Python application is designed to automate the process of catching Pokemons
 </p>
 
 ## 🚀 Setup Instructions
- Install Python 3.9 >
+ Install Python >= 3.9
 
  Get your API-KEY 🔑: [PokeMeow Captcha Solver](https://rapidapi.com/qqqwda/api/pokemeow-captcha-solver)
 
