@@ -103,9 +103,17 @@ class Inventory:
                         item_name = item.img['alt'] if item.img else "Unknown"
                         count_text = item.find_next_sibling("strong")
                         count = count_text.get_text(strip=True) if count_text else "0"
+                        
+                        # Try to convert count to an integer
+                        try:
+                            count = int(count.replace(",", ""))
+                        except ValueError:
+                            # If count is not an integer, set it to -1
+                            count = -1
+                        
                         item_dict = {
                             "name": item_name. replace(":", "").lower(),
-                            "count": int(count.replace(",", ""))
+                            "count": count
                         }
                         items_list.append(item_dict)
             
