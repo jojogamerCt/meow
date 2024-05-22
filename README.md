@@ -133,6 +133,7 @@ pause
    driver_path = webdrivers\Chrome\chromedriver.exe
    
    predict_captcha_url=https://pokemeow-captcha-solver.p.rapidapi.com/predict
+   
    ```
 To run just double click on `run_account_example.bat`  file
 
