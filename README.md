@@ -137,7 +137,7 @@ pause
    ```
 To run just double click on `run_account_example.bat`  file
 
-Want to add another account? 
+Do you want to add another account? 
 
 Create another `run_account_example_2.bat`  file
 
