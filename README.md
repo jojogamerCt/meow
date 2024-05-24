@@ -149,8 +149,3 @@ Create another `run_account_example_2.bat`  file
 ## ⚠️ Disclaimer
 Please note, while this bot is designed to automate tasks within PokeMeow, users are encouraged to use it responsibly and in accordance with the game's terms of service. The developer of this bot assumes no responsibility for any bans or penalties that may result from the use of this bot. Users should be aware of PokeMeow's rules and use the bot at their own risk.
 
-## 📬 Contact
-
-For support, questions, or collaboration, feel free to contact me on Discord:
-
-- Discord: cursedelboom
