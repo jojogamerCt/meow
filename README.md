@@ -46,7 +46,6 @@ This Python application is designed to automate the process of catching Pokemons
    Click on this image or https://www.youtube.com/watch?v=ZH7YryYCqg4
 </p>
 <p align="center">
-   
   <a href="https://www.youtube.com/watch?v=ZH7YryYCqg4">
     <img src="https://github.com/qqqwda/pokemeow-autoplay/assets/41929135/72825f7f-f059-4d1c-b8bd-42f55ae51272" width="50%">
   </a>
