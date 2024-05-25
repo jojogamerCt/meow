@@ -207,3 +207,9 @@ class Explore(ActionHandler):
                 # Handle potential errors if the img tag isn't found within the button
                 self.logger.error(f"Error processing button: {e}")
     
+    def pause(self):
+        catch_statistics.print_statistics()
+        from instances.bot_instance import bot
+        
+        bot.disable_task(bot.explore_task)
+        logger.warning('[Explore] Action Explore is disabled.')

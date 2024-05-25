@@ -38,5 +38,12 @@ def evaluate_response(pokemeow_element_response:WebElement) -> Action:
         logger.warning('You reached your daily catch limit. Stopping the bot...')
         logger.warning('You reached your daily catch limit. Stopping the bot...')
         return Action.PAUSE
+    
+    if "have reached the daily" in pokemeow_element_response.text:
+        logger.warning('You reached your daily catch limit. Stopping the bot...')
+        logger.warning('You reached your daily catch limit. Stopping the bot...')
+        logger.warning('You reached your daily catch limit. Stopping the bot...')
+        return Action.PAUSE
+    
        
     return Action.PROCEED
