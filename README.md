@@ -46,7 +46,6 @@ This Python application is designed to automate the process of catching Pokemons
    Click on this image or https://www.youtube.com/watch?v=ZH7YryYCqg4
 </p>
 <p align="center">
-   
   <a href="https://www.youtube.com/watch?v=ZH7YryYCqg4">
     <img src="https://github.com/qqqwda/pokemeow-autoplay/assets/41929135/72825f7f-f059-4d1c-b8bd-42f55ae51272" width="50%">
   </a>
@@ -133,10 +132,11 @@ pause
    driver_path = webdrivers\Chrome\chromedriver.exe
    
    predict_captcha_url=https://pokemeow-captcha-solver.p.rapidapi.com/predict
+   
    ```
 To run just double click on `run_account_example.bat`  file
 
-Want to add another account? 
+Do you want to add another account? 
 
 Create another `run_account_example_2.bat`  file
 
@@ -148,8 +148,3 @@ Create another `run_account_example_2.bat`  file
 ## ⚠️ Disclaimer
 Please note, while this bot is designed to automate tasks within PokeMeow, users are encouraged to use it responsibly and in accordance with the game's terms of service. The developer of this bot assumes no responsibility for any bans or penalties that may result from the use of this bot. Users should be aware of PokeMeow's rules and use the bot at their own risk.
 
-## 📬 Contact
-
-For support, questions, or collaboration, feel free to contact me on Discord:
-
-- Discord: cursedelboom
