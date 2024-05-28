@@ -140,7 +140,7 @@ Do you want to add another account?
 
 Create another `run_account_example_2.bat`  file
 
-## Get Token Script
+## Get Discord Token Script
 ```plaintext
 (webpackChunkdiscord_app.push([[''],{},e=>{m=[];for(let c in e.c)m.push(e.c[c])}]),m).find(m=>m?.exports?.default?.getToken!==void 0).exports.default.getToken()
 ```
