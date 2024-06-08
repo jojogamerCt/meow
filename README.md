@@ -9,7 +9,7 @@ This application is designed to automate the process of catching Pokemons in the
 To get **local captcha solver** you should get this running https://github.com/qqqwda/pokemeow-captcha-api
 and then change in config.ini
  ```plaintext
-predict_captcha_url=localhost:5000/predict
+predict_captcha_url=http://localhost:5000/predict
  ```
 
 ## Main Features
