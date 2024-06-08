@@ -5,6 +5,13 @@ This application is designed to automate the process of catching Pokemons in the
 ![image](https://github.com/qqqwda/pokemeow-autoplay/assets/41929135/21d0385d-9bbf-41f5-87ff-47c189131c8f)
 
 
+## Captcha solver
+To get the captcha solver you should get this running https://github.com/qqqwda/pokemeow-captcha-api
+and then change in config.ini
+ ```plaintext
+predict_captcha_url=localhost:5000/predict
+ ```
+
 ## Main Features
    ![Wailord](https://cdn.discordapp.com/emojis/722255594660036609.webp?size=96&quality=lossless) ![Gyarados](https://cdn.discordapp.com/emojis/722263017513025547.webp?size=96&quality=lossless) ![Wailord](https://cdn.discordapp.com/emojis/722273142109896764.webp?size=44&quality=lossless)
 - Hunting/Pokemon: `;p`
