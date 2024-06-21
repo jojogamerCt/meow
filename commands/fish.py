@@ -188,7 +188,7 @@ class Fish(ActionHandler):
         has_item = pokemon_info.get('Item')
 
         if pokemon_was_catched:
-            footer_text = soup.find('div', class_='embedFooter_c26cec').get_text(strip=True)
+            footer_text = soup.find('div', class_=lambda value: value and 'embedFooter' in value).get_text(strip=True)
             fishing_tokens_match = re.search(r'earned (\d+) Fishing Token', footer_text)
 
             # Initialize fishing_tokens to 0, then update if found in the text
