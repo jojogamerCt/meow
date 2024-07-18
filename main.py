@@ -16,10 +16,6 @@ def try_login(driver):
     channel = os.getenv('CHANNEL')
     api_key = os.getenv('API_KEY')
     discord_token = os.getenv('DISCORD_TOKEN')
-    if not (api_key and len(api_key) > 25):
-        logger.error("Error: Invalid API key.")
-        logger.error("Please get you API key from https://rapidapi.com/qqqwda/api/pokemeow-captcha-solver")
-        sys.exit(1)
 
     driver.start_driver()
     #  check if discord_token is valid
