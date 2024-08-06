@@ -10,7 +10,7 @@ and then change in **config.ini**
  ```plaintext
 predict_captcha_url=http://localhost:5000/predict
  ```
-
+ 
 ## Main Features
 
    ![Wailord](https://cdn.discordapp.com/emojis/722255594660036609.webp?size=96&quality=lossless) ![Gyarados](https://cdn.discordapp.com/emojis/722263017513025547.webp?size=96&quality=lossless) ![Wailord](https://cdn.discordapp.com/emojis/722273142109896764.webp?size=44&quality=lossless)
