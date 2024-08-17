@@ -1,4 +1,4 @@
-# PokéMeow autoplay 
+# PokéMeow autoplay
 
 This application is designed to automate the process of catching Pokemons in the popular Discord game, PokéMeow Utilizing Selenium and ChromeDriver.
 
