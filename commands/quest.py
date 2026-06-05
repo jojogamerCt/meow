@@ -61,13 +61,16 @@ class Quest:
 
         # Extract quest number and emoji description
         for quest in quests:
-            quest_number = quest.span.text.strip()
+            quest_number_str = quest.span.text.strip()
+            match = re.search(r'\d+', quest_number_str)
+            quest_number = int(match.group()) if match else 1
+
             emoji_img = quest.find_next("img", class_="emoji")  # Directly find the next emoji image
             if emoji_img and 'alt' in emoji_img.attrs:
                 emoji = emoji_img['alt'].strip(':')
-                quest_data.append({int(quest_number): emoji})
+                quest_data.append({quest_number: emoji})
             else:
-                print(f"DEBUG: Emoji image not found or missing 'alt' attribute in quest {quest_number}")
+                print(f"DEBUG: Emoji image not found or missing 'alt' attribute in quest {quest_number_str}")
 
         return quest_data
 
