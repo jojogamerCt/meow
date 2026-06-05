@@ -94,18 +94,22 @@ class Driver:
                 break
 
         try:
-            self.driver = webdriver.Chrome(executable_path=self.driver_path, options=options)
-            
-        except SessionNotCreatedException:
-            logger.error("Error: The version of ChromeDriver is not compatible with your installed version of Google Chrome.")
-            logger.error("Please update Google Chrome to the latest version or install a compatible version of ChromeDriver.")
-            raise  # re-raise the exception after handling it
-        except:
-            logger.warning(f"Driver not found in path: {self.driver_path}")
-            logger.warning(f"or version incompatible")
-            logger.warning(f"Downloading compatible version...")
-            chromedriver_autoinstaller.install()
+            # First, try letting Selenium Manager handle ChromeDriver automatically (best practice in Selenium 4)
             self.driver = webdriver.Chrome(options=options)
+        except Exception as e1:
+            logger.warning(f"Could not launch Chrome using Selenium Manager: {e1}")
+            try:
+                # Next, try with the configured local driver path
+                self.driver = webdriver.Chrome(executable_path=self.driver_path, options=options)
+            except Exception as e2:
+                logger.warning(f"Failed to launch Chrome with local driver path: {e2}")
+                logger.warning("Attempting to auto-install matching ChromeDriver version...")
+                try:
+                    chromedriver_autoinstaller.install()
+                    self.driver = webdriver.Chrome(options=options)
+                except Exception as e3:
+                    logger.error(f"Critical error: Failed to initialize Google Chrome driver: {e3}")
+                    raise
     
     def navigate_to_page(self, url):
         if self.driver is not None:
@@ -519,7 +523,7 @@ class Driver:
         logger.warning('[config.ini] Default ball for Shinies or Golden while Fishing: %s', fish_shiny_golden_ball)
         logger.warning("="*60 + "\n")      
         API_KEY = os.getenv('API_KEY')
-        welcome_message = f"""
+        welcome_message = fr"""
         {Fore.LIGHTMAGENTA_EX}
               __  __                      
              |  \/  |  ___  ___ __      __
