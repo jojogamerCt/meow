@@ -180,11 +180,10 @@ class Driver:
             logger.error('All login attempts failed')
                 
     def write(self, msg):
-        # span = self.driver.find_element(By.XPATH, "//span[contains(@class='emptyText'])")
-        span = self.driver.find_element(By.XPATH, "//span[contains(@class, 'emptyText')]")
+        textbox = self.driver.find_element(By.XPATH, "//div[@role='textbox']")
 
-        ActionChains(self.driver).send_keys_to_element(span, Keys.BACK_SPACE*20).send_keys_to_element(span, msg).perform()
-        ActionChains(self.driver).send_keys_to_element(span, Keys.ENTER).perform()
+        ActionChains(self.driver).send_keys_to_element(textbox, Keys.BACK_SPACE*20).send_keys_to_element(textbox, msg).perform()
+        ActionChains(self.driver).send_keys_to_element(textbox, Keys.ENTER).perform()
     
     def click_next_button(self):
         try:
@@ -451,7 +450,7 @@ class Driver:
         logger.info("Refreshing the page...")
         self.driver.refresh()
         # Wait for the element to be visible, not just present
-        element_locator = (By.XPATH, "//span[contains(@class, 'emptyText')]")
+        element_locator = (By.XPATH, "//div[@role='textbox']")
         WebDriverWait(self.driver, 15).until(EC.visibility_of_element_located(element_locator))
         logger.info("Page refreshed successfully.")
         

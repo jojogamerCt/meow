@@ -24,7 +24,7 @@ def safely_refresh_page(self):
     try:
         self.driver.driver.refresh()
         # Wait for the element to be visible, not just present
-        element_locator = (By.XPATH, "//span[contains(@class, 'emptyText')]")
+        element_locator = (By.XPATH, "//div[@role='textbox']")
         WebDriverWait(self.driver.driver, 15).until(EC.visibility_of_element_located(element_locator))
     except Exception as e:
         logger.error(f"Failed to refresh the page and find element: {e}")
@@ -34,7 +34,7 @@ def process_game_state(self, retry_count=0):
     max_retries = 3
     try:
         time.sleep(1.5)  # Short delay to ensure stability
-        element_locator = (By.XPATH, "//span[contains(@class, 'emptyText')]")
+        element_locator = (By.XPATH, "//div[@role='textbox']")
         WebDriverWait(self.driver.driver, 15).until(EC.visibility_of_element_located(element_locator))
         
         pokemeow_message = self.driver.get_last_message_from_user("PokéMeow")
