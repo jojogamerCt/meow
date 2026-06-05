@@ -26,6 +26,14 @@ def try_login(driver):
     else:
         driver.navigate_to_page("https://discord.com/login")
         driver.login(email,password)
+    # Check if channel URL is a template placeholder
+    if not channel or channel.endswith("/channel") or "id/channel" in channel:
+        logger.error("❌ ERROR: Your CHANNEL URL in the bat file is invalid or still using a placeholder!")
+        logger.error("It should end with a channel ID number, for example: https://discord.com/channels/1512492330857533442/1512492330857533445")
+        logger.error("Please edit your run_account.bat file and set a valid channel URL.")
+        driver.quit_driver()
+        sys.exit(1)
+
     driver.navigate_to_page(channel)
     interruptible_sleep(5)
     
