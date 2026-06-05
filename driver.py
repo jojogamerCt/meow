@@ -110,7 +110,7 @@ class Driver:
             logger.info("Driver not started. Nothing to quit.")
             
     def inject_token(self, token) -> bool:
-        logger.info("Loging with token!")
+        logger.info("Logging in with token...")
         # Open Discord login page
         self.driver.get("https://discord.com/login")
 
@@ -133,12 +133,8 @@ class Driver:
         # Verify if login was successful (you can add your own logic here)
         if self.driver.current_url == "https://discord.com/channels/@me":
             logger.info("Login successful!")
-            logger.info("Login successful!")
-            logger.info("Login successful!")
             return True
         else:
-            logger.error("Login with token failed.")
-            logger.error("Login with token failed.")
             logger.error("Login with token failed.")
             return False
         
@@ -180,11 +176,22 @@ class Driver:
             logger.error('All login attempts failed')
                 
     def write(self, msg):
-        # Wait until the chat textbox is clickable (loaded and visible)
-        WebDriverWait(self.driver, 20).until(
-            EC.element_to_be_clickable((By.XPATH, "//div[@role='textbox']"))
-        )
-        textbox = self.driver.find_element(By.XPATH, "//div[@role='textbox']")
+        try:
+            # Wait until the chat textbox is clickable (loaded and visible)
+            WebDriverWait(self.driver, 20).until(
+                EC.element_to_be_clickable((By.XPATH, "//div[@role='textbox']"))
+            )
+            textbox = self.driver.find_element(By.XPATH, "//div[@role='textbox']")
+        except TimeoutException:
+            logger.error("Timeout waiting for chat box (//div[@role='textbox']).")
+            logger.error(f"Current URL is: {self.driver.current_url}")
+            logger.error(f"Page Title is: {self.driver.title}")
+            try:
+                self.driver.save_screenshot("textbox_timeout_screenshot.png")
+                logger.error("Saved debug screenshot to C:\\Users\\giuse\\Documents\\Projects\\MEOW\\meow\\textbox_timeout_screenshot.png")
+            except Exception as se:
+                logger.error(f"Failed to capture screenshot: {se}")
+            raise
 
         ActionChains(self.driver).send_keys_to_element(textbox, Keys.BACK_SPACE*20).send_keys_to_element(textbox, msg).perform()
         ActionChains(self.driver).send_keys_to_element(textbox, Keys.ENTER).perform()
