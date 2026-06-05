@@ -503,13 +503,19 @@ class Driver:
         logger.info("[Developer info] Keep updated on changes at Github: https://github.com/jojogamerCt/meow")
         print("\n")
         
-        API_KEY = os.getenv('API_KEY')
-        #Check that api key len is up to 20
-        if len(API_KEY) < 20:
-            logger.error("API_KEY not found. Please add your API_KEY in the .env file !")
-            logger.error("Quitting driver !")
-            self.driver.quit()
-            return
+        API_KEY = os.getenv('API_KEY') or ""
+        predict_url = settings.predict_captcha_url
+        is_local = "localhost" in predict_url or "127.0.0.1" in predict_url
+
+        if is_local:
+            logger.info("ℹ️ Using local captcha solver, skipping API_KEY length validation.")
+        else:
+            #Check that api key len is up to 20
+            if len(API_KEY) < 20:
+                logger.error("API_KEY not found or invalid. Please add your API_KEY in the .env or bat file !")
+                logger.error("Quitting driver !")
+                self.driver.quit()
+                return
     
     def validate(self):
         pokemeow_last_message = self.get_last_message_from_user("PokéMeow")
