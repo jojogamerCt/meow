@@ -180,6 +180,10 @@ class Driver:
             logger.error('All login attempts failed')
                 
     def write(self, msg):
+        # Wait until the chat textbox is clickable (loaded and visible)
+        WebDriverWait(self.driver, 20).until(
+            EC.element_to_be_clickable((By.XPATH, "//div[@role='textbox']"))
+        )
         textbox = self.driver.find_element(By.XPATH, "//div[@role='textbox']")
 
         ActionChains(self.driver).send_keys_to_element(textbox, Keys.BACK_SPACE*20).send_keys_to_element(textbox, msg).perform()
