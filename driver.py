@@ -193,8 +193,24 @@ class Driver:
                 logger.error(f"Failed to capture screenshot: {se}")
             raise
 
-        ActionChains(self.driver).send_keys_to_element(textbox, Keys.BACK_SPACE*20).send_keys_to_element(textbox, msg).perform()
-        ActionChains(self.driver).send_keys_to_element(textbox, Keys.ENTER).perform()
+        # Click textbox first to focus it, mimicking human click
+        ActionChains(self.driver).click(textbox).perform()
+        time.sleep(random.uniform(0.2, 0.5))
+
+        # Clear existing text using select all and delete to avoid instant reset
+        textbox.send_keys(Keys.CONTROL + 'a')
+        time.sleep(random.uniform(0.1, 0.25))
+        textbox.send_keys(Keys.BACKSPACE)
+        time.sleep(random.uniform(0.1, 0.25))
+
+        # Type character by character with small random delays (mimic typing speed of 60-100 WPM)
+        for char in msg:
+            textbox.send_keys(char)
+            time.sleep(random.uniform(0.06, 0.17))
+
+        # Small pause before hitting enter
+        time.sleep(random.uniform(0.25, 0.6))
+        textbox.send_keys(Keys.ENTER)
     
     def click_next_button(self):
         try:
@@ -394,7 +410,8 @@ class Driver:
     def click_on_ball(self, ball, delay=1):
         # Attempt to find the specific ball first.
         try:
-            time.sleep(delay)
+            # Add a small random human-like delay on top of the fixed delay
+            time.sleep(delay + random.uniform(0.15, 0.45))
             last_element_html = self.get_last_element_by_user("PokéMeow")
             balls = last_element_html.find_elements("css selector",f'img[alt="{ball}"]')
             if balls:
