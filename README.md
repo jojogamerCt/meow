@@ -1,11 +1,11 @@
-# PokéMeow autoplay
+# Meow Autoplay
 
-This application is designed to automate the process of catching Pokemons in the popular Discord game, PokéMeow Utilizing Selenium and ChromeDriver.
+This application is designed to automate the process of catching Pokemons in the popular Discord game, PokéMeow, utilizing Selenium and ChromeDriver.
 
-![image](https://github.com/qqqwda/pokemeow-autoplay/assets/41929135/21d0385d-9bbf-41f5-87ff-47c189131c8f)
+![image](https://github.com/jojogamerCt/meow/assets/41929135/21d0385d-9bbf-41f5-87ff-47c189131c8f)
 ## Captcha solver  
  
- ⚠️RapidApi service is no longer working.⚠️ To get **local captcha solver** you should get this running https://github.com/qqqwda/pokemeow-captcha-api
+ ⚠️RapidApi service is no longer working.⚠️ To get **local captcha solver** you should get this running https://github.com/jojogamerCt/meow-captcha-api
 and then change in **config.ini**
  ```plaintext
 predict_captcha_url=http://localhost:5000/predict

@@ -484,25 +484,23 @@ class Driver:
         API_KEY = os.getenv('API_KEY')
         welcome_message = f"""
         {Fore.LIGHTMAGENTA_EX}
-            
-            ██████╗░░█████╗░██╗░░██╗███████╗███╗░░░███╗███████╗░█████╗░░██╗░░░░░░░██╗ 
-            ██╔══██╗██╔══██╗██║░██╔╝██╔════╝████╗░████║██╔════╝██╔══██╗░██║░░██╗░░██║
-            ██████╔╝██║░░██║█████═╝░█████╗░░██╔████╔██║█████╗░░██║░░██║░╚██╗████╗██╔╝
-            ██╔═══╝░██║░░██║██╔═██╗░██╔══╝░░██║╚██╔╝██║██╔══╝░░██║░░██║░░████╔═████║░
-            ██║░░░░░╚█████╔╝██║░╚██╗███████╗██║░╚═╝░██║███████╗╚█████╔╝░░╚██╔╝░╚██╔╝░
-            ╚═╝░░░░░░╚════╝░╚═╝░░╚═╝╚══════╝╚═╝░░░░░╚═╝╚══════╝░╚════╝░░░░╚═╝░░░╚═╝░░
-            
-            ░█████╗░██╗░░░██╗████████╗░█████╗░██████╗░██╗░░░░░░█████╗░██╗░░░██╗
-            ██╔══██╗██║░░░██║╚══██╔══╝██╔══██╗██╔══██╗██║░░░░░██╔══██╗╚██╗░██╔╝
-            ███████║██║░░░██║░░░██║░░░██║░░██║██████╔╝██║░░░░░███████║░╚████╔╝░
-            ██╔══██║██║░░░██║░░░██║░░░██║░░██║██╔═══╝░██║░░░░░██╔══██║░░╚██╔╝░░
-            ██║░░██║╚██████╔╝░░░██║░░░╚█████╔╝██║░░░░░███████╗██║░░██║░░░██║░░░
-            ╚═╝░░╚═╝░╚═════╝░░░░╚═╝░░░░╚════╝░╚═╝░░░░░╚══════╝╚═╝░░╚═╝░░░╚═╝░░░ {Style.RESET_ALL}  Version: {settings.version}
+              __  __                      
+             |  \/  |  ___  ___ __      __
+             | |\/| | / _ \/ _ \\ \ /\ / /
+             | |  | ||  __/ (_) |\ V  V / 
+             |_|  |_| \___|\___/  \_/\_/  
+                                          
+               _   _  _              _               
+              / \ | || |  ___  _ __ | |  __ _  _   _ 
+             / _ \| || | / _ \| '__|| | / _` || | | |
+            / ___ \| || || (_) || |   | || (_| || |_| |
+           /_/   \_\_||_| \___/ |_|   |_| \__,_| \__, |
+                                                 |___/ {Style.RESET_ALL}  Version: {settings.version}
 
         """
         print(welcome_message)
-        logger.info("[Developer info] Keep updated on changes at Github: https://github.com/qqqwda/pokemeow-autoplay")
-        logger.info("[Developer info] Keep updated on changes at Github: https://github.com/qqqwda/pokemeow-autoplay")
+        logger.info("[Developer info] Keep updated on changes at Github: https://github.com/jojogamerCt/meow")
+        logger.info("[Developer info] Keep updated on changes at Github: https://github.com/jojogamerCt/meow")
         print("\n")
         
         API_KEY = os.getenv('API_KEY')

@@ -1,4 +1,4 @@
-pip install -r requirements.txt
+call .\venv\Scripts\activate
 set SESSION_NAME=account1
 set EMAIL=email1@gmail.com
 set PASSWORD=strongpassword
@@ -16,5 +16,5 @@ set ENABLE_HUNTING=True
 set ENABLE_EXPLORING=False
 set ENABLE_CHROME_HEADLESS=True
 set ENABLE_RUN_PICTURES=False
-py main.py %0
+python main.py
 pause
