@@ -83,6 +83,16 @@ class Driver:
         
         options.headless = ENABLE_CHROME_HEADLESS
 
+        # Explicitly set Chrome binary location if it exists in standard Windows paths
+        chrome_paths = [
+            r"C:\Program Files\Google\Chrome\Application\chrome.exe",
+            r"C:\Program Files (x86)\Google\Chrome\Application\chrome.exe"
+        ]
+        for path in chrome_paths:
+            if os.path.exists(path):
+                options.binary_location = path
+                break
+
         try:
             self.driver = webdriver.Chrome(executable_path=self.driver_path, options=options)
             
